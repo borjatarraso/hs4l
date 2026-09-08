@@ -119,3 +119,29 @@ material and bypasses no authentication. See VENDOR-NOTICE.md.
 
 BSD-3-Clause for the original work here (see [LICENSE](LICENSE)). Vendor
 binaries are not included and remain the property of their owners.
+
+## Native x86-64 build (no qemu) and the wider Güralp SPYRUS corpus
+
+Güralp's open rsync server also carries an **x86-64** Platinum platform
+(`CMG-NAM64`) whose `spyrus_util` 2.1.0 is unstripped, has debug info, and
+runs directly on a 64-bit PC with its own loader and libraries:
+
+```sh
+scripts/fetch-corpus.sh          # mirrors every SPYRUS file for all 7 platforms + NAM64 lib closure
+bin/spy-native.sh --status       # same CLI as bin/spy.sh, no qemu-user needed
+```
+
+`fetch-corpus.sh` populates `vendor/guralp-spyrus-corpus/` (git-ignored, with
+its own `CHECKSUMS.sha256` and `INDEX.md`). Besides the binaries it brings the
+GPL-2 C headers — `spyrus.h`, `spyrus_dss.h` and, from the older `CMG-DCM-mk4`
+SDK, `spyrus_int.h` with every card opcode and wire struct — the GPL
+`spyrus_cs.ko` PCMCIA driver for the card-slot LYNKS, Güralp's udev rule,
+init script, first-boot provisioning script and web-UI CGI. The
+`libspyrus`/`spyrus-utils` *source* is not on Güralp's open-source page or
+rsync (the builder module is access-restricted and git.guralp.com no longer
+resolves); the library is GPL-2, so the source is obtainable from Güralp on
+request.
+
+`libspyrus` keeps a use-lock at `/var/lock/spyrus.lck` and its config in
+`/etc/spyrus/`; if you first ran it as root, grant your user an ACL on both
+before using the native wrapper unprivileged.

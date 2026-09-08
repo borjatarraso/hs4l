@@ -7,3 +7,4 @@ __pycache__/
 # local scratch
 /tmp/
 *.local
+/vendor/guralp-spyrus-corpus/
