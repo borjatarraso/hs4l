@@ -4,6 +4,18 @@ All notable changes to hs4l are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions are git
 tags `vX.Y`.
 
+## [0.6] - 2026-09-08
+
+### Added
+- README "Supported devices" table: the verified LYNKS Series II USB token,
+  other Series II USB units, the PCMCIA card path through `spyrus_cs.ko`
+  (untested), and the SPYRUS products hs4l does not cover.
+
+### Changed
+- README, VENDOR-NOTICE.md, docs/REINITIALIZE.md and docs/TROUBLESHOOTING.md
+  now match the code: unprivileged wrappers, the fetch fix, the ARM 2.1.5 vs
+  x86-64 2.1.0 caveat, and the in-repo corpus checksums.
+
 ## [0.5] - 2026-09-08
 
 ### Added
