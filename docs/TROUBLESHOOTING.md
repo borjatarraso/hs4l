@@ -26,9 +26,27 @@ Each of these cost real time; each is traced to a root cause.
 - **`errno 22` on a status read.** Benign quirk of qemu's ioctl translation;
   the payload still comes back.
 
-- **Permission denied opening the device.** libusb needs **read+write** on the
-  USB node. Re-apply the chmod / re-plug after every re-enumeration, or install
-  the udev rule (`scripts/setup-udev.sh`).
+- **`Opening device 0 failed. Unix error 13 (Permission denied)`.** Usually
+  not the USB node: run with `-D -D` and you see `Failed to create lock file` —
+  `/var/lock/spyrus.lck` or `/etc/spyrus/` is root-owned from an earlier sudo
+  run. `scripts/setup-udev.sh` fixes both (plus the udev rule and the `spyrus`
+  group), or let the wrapper fall back to sudo (`HS4L_SUDO=1` forces it).
+  libusb itself needs **read+write** on the node; the rule (`uaccess` tag +
+  group) grants that across re-plugs, so no per-boot chmod.
+
+- **Native build: `--getkey` prints nothing, exit 1.** With `-D`:
+  `spyrus_get_key: Unable to unpack PEM` / `Failed to find public key`. The
+  x86-64 `spyrus_util` is 2.1.0 and cannot parse the CRLF PEM that the 2.1.5
+  ARM build stores in the slot. Use `bin/spy-native-getkey.sh N > pub.pem`,
+  which rebuilds it from `--get --index N`.
+
+- **`spyrus_util` under qemu cannot load `libiso8601.so.1` / `libz.so.1`.**
+  Sysroot from an older `fetch-vendor.sh`, which missed the two libraries
+  living in `lib/` (not `usr/lib`). Re-run `scripts/fetch-vendor.sh`;
+  `CHECKSUMS.sha256` now covers all 20 files.
+
+- **`verify.py` refuses the key.** It only accepts DSA public keys and says
+  so; a missing file exits 2.
 
 - **`qemu-arm-static: not found`.** Install the `qemu-user-static` package.
 

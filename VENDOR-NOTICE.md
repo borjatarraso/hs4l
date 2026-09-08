@@ -10,11 +10,11 @@ binary and library:
 
 | file | role | ~size |
 |------|------|-------|
-| `usr/sbin/spyrus_util` | the CLI that inits / keygens / signs | 36 KB |
+| `usr/sbin/spyrus_util` | the CLI that inits / keygens / signs (2.1.5) | 36 KB |
 | `usr/lib/libspyrus.so.3(.1)` | the SPYCOS protocol engine | 243 KB |
 | `usr/sbin/spyrus_test`, `cd11-spyrus-tool.sh` | vendor helpers | — |
-| `usr/lib/libgslutil`, `libiso8601`, `libioline-*` | vendor support libs | — |
-| `usr/lib/libusb-1.0`, `libssl/ libcrypto 1.0.0`, `/lib/*` glibc | runtime | — |
+| `usr/lib/libgslutil`, `libioline-*`, `lib/libiso8601` | vendor support libs | — |
+| `usr/lib/libusb-1.0`, `libusb-0.1`, `libssl/ libcrypto 1.0.0`, `lib/libz`, `/lib/*` glibc | runtime | — |
 
 These originate in a **seismic-instrument vendor's "Platinum" digitiser firmware** and
 embed **SPYRUS, Inc.** intellectual property. SPYRUS was acquired by
@@ -26,7 +26,7 @@ kept out of git.
 
 `scripts/fetch-vendor.sh` downloads exactly those files from the vendor's own
 **public** rsync mirror into `vendor/sysroot/`, then verifies them against
-[`CHECKSUMS.sha256`](CHECKSUMS.sha256) (SHA-256 of the June-2024 Platinum
+[`CHECKSUMS.sha256`](CHECKSUMS.sha256) (20 files; SHA-256 of the June-2024 Platinum
 "stable" build these docs were written against). You are pulling the vendor's
 own published bytes, not a re-hosted copy.
 
@@ -56,4 +56,5 @@ your call to make, not this project's default.
 Only files carrying their own GPL notice are committed, under
 `third_party/spyrus-gpl/`, with licence texts and provenance. Everything
 binary, and every file without a licence notice, remains fetch-at-install
-via `scripts/fetch-vendor.sh` / `scripts/fetch-corpus.sh`.
+via `scripts/fetch-vendor.sh` / `scripts/fetch-corpus.sh` (the corpus is
+verified against `CHECKSUMS.corpus.sha256`).

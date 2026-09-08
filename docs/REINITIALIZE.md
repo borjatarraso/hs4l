@@ -9,10 +9,9 @@ care about, stop: reinit erases them.)
 
 ```sh
 scripts/fetch-vendor.sh          # get vendor/sysroot/ (see VENDOR-NOTICE.md)
-scripts/setup-udev.sh            # optional: group access, no per-boot chmod
-# or, ad hoc, find the node and open it:
-lsusb -d 08df:0a00               # note the bus/device numbers
-sudo chmod 666 /dev/bus/usb/BBB/DDD
+scripts/setup-udev.sh            # run without sudo: udev rule, spyrus group, lock + /etc/spyrus
+# or skip it: bin/spy.sh falls back to sudo when the USB node, /var/lock/spyrus.lck
+# or /etc/spyrus are not writable by you (HS4L_SUDO=1 forces sudo, =0 forbids it)
 ```
 
 ## 1. Read state (read-only, safe)
@@ -45,6 +44,7 @@ its counter and `h`).
 
 ```sh
 bin/spy.sh --getkey --index 1 > pub.pem
+# native 2.1.0 build: bin/spy-native-getkey.sh 1 > pub.pem  (its --getkey fails)
 openssl dsa -pubin -in pub.pem -text -noout   # inspect P/Q/G/Y
 ```
 
