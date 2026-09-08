@@ -1,6 +1,7 @@
 # Vendor ARM runtime is NOT redistributed here -- fetched on demand.
 # See VENDOR-NOTICE.md and scripts/fetch-vendor.sh
 /vendor/sysroot/
+/vendor/firmware/
 *.pyc
 __pycache__/
 # local scratch

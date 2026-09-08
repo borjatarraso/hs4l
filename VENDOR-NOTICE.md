@@ -42,7 +42,7 @@ hand; any Güralp Platinum ARM rootfs (release ≥ 15781) will do.
 Everything here operates a device **you physically own and are entitled to
 use**. The reinitialise-from-scratch path (`--init`) is a **documented**
 SPYCOS function; hs4l extracts no key material and bypasses no
-authentication. The original recovery write-up is linked from the README.
+authentication.
 
 ## If you have the right to bundle the blobs
 
