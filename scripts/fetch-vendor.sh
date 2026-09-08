@@ -7,8 +7,12 @@
 # verifies them against CHECKSUMS.sha256 so you know you got the exact build
 # these instructions were written for.
 #
-#   scripts/fetch-vendor.sh            # fetch, then verify
-#   scripts/fetch-vendor.sh --verify   # verify an existing vendor/sysroot only
+#   scripts/fetch-vendor.sh                 # fetch, then verify
+#   scripts/fetch-vendor.sh --verify        # verify an existing vendor/sysroot only
+#   scripts/fetch-vendor.sh --verify -q     # same, list only what is missing or differs
+#
+# Exit status: 0 every file present and matching, 1 something missing or
+# different (or rsync failed), 127 rsync not installed.
 set -euo pipefail
 
 # shellcheck disable=SC1007  # CDPATH= is intentional: keep cd silent
@@ -17,8 +21,14 @@ DEST="${HS4L_SYSROOT:-$ROOT/vendor/sysroot}"   # same override bin/spy.sh honour
 SUMS="$ROOT/CHECKSUMS.sha256"
 MIRROR="${HS4L_MIRROR:-rsync://rsync.guralp.com/platinum-stable/CMG-DCM-mk4-eabi}"
 
+QUIET=0
+
 verify() {
-  [ -f "$SUMS" ] || { echo "hs4l: $SUMS missing"; return 1; }
+  [ -f "$SUMS" ] || { echo "hs4l: $SUMS missing; restore it from git before verifying" >&2; return 1; }
+  if [ ! -d "$DEST" ]; then
+    echo "hs4l: $DEST does not exist; run scripts/fetch-vendor.sh to populate it" >&2
+    return 1
+  fi
   local ok=0 miss=0 bad=0 sum rel path got
   while read -r sum rel; do
     case "$sum" in ''|\#*) continue ;; esac
@@ -28,25 +38,40 @@ verify() {
     fi
     got=$(sha256sum "$path" | awk '{print $1}')
     if [ "$got" = "$sum" ]; then
-      echo "  OK       $rel"; ok=$((ok+1))
+      [ "$QUIET" = 1 ] || echo "  OK       $rel"; ok=$((ok+1))
     else
       echo "  MISMATCH $rel"; bad=$((bad+1))
     fi
   done < "$SUMS"
-  echo
-  echo "hs4l: verify -- $ok ok, $miss missing, $bad mismatched"
+  [ "$QUIET" = 1 ] || echo
+  echo "hs4l: verify -- $ok ok, $miss missing, $bad mismatched ($DEST)"
+  if [ "$miss" -gt 0 ]; then
+    echo "hs4l: files missing -- run scripts/fetch-vendor.sh (again) to pull them" >&2
+  fi
+  if [ "$bad" -gt 0 ]; then
+    echo "hs4l: files differ from the build these notes were written for --" >&2
+    echo "hs4l: the mirror may have moved to a newer release. They may still work;" >&2
+    echo "hs4l: to get the documented build, delete $DEST and re-fetch, or point" >&2
+    echo "hs4l: HS4L_MIRROR at a mirror that still carries it." >&2
+  fi
   [ "$bad" -eq 0 ] && [ "$miss" -eq 0 ]
 }
 
-if [ "${1:-}" = "--verify" ]; then
-  verify; exit $?
-fi
+case "${1:-}" in
+  --verify)
+    case "${2:-}" in -q|--quiet) QUIET=1 ;; '') ;; *) echo "hs4l: unknown option $2" >&2; exit 2 ;; esac
+    verify; exit $? ;;
+  -h|--help)
+    sed -n '2,/^set -euo/{/^set -euo/!s/^# \{0,1\}//p}' "$0"; exit 0 ;;
+  '') ;;
+  *) echo "hs4l: unknown option $1 (try --help)" >&2; exit 2 ;;
+esac
 
 echo "hs4l: fetching Platinum ARM rootfs (release >= 15781)"
 echo "hs4l:   from   $MIRROR"
 echo "hs4l:   into   $DEST"
 echo
-command -v rsync >/dev/null 2>&1 || { echo "hs4l: rsync required." >&2; exit 127; }
+command -v rsync >/dev/null 2>&1 || { echo "hs4l: rsync required; install the rsync package." >&2; exit 127; }
 mkdir -p "$DEST"
 
 # Only the paths spyrus_util actually needs (readelf -d on it, libspyrus,
@@ -77,10 +102,10 @@ rsync -av --prune-empty-dirs \
   --exclude='*' \
   "$MIRROR/" "$DEST/" || {
     echo
-    echo "hs4l: rsync failed -- the mirror path or release layout may have moved."
-    echo "hs4l: browse $MIRROR, copy usr/sbin/spyrus_util plus every NEEDED lib"
-    echo "hs4l: (run 'readelf -d spyrus_util') into vendor/sysroot/, then:"
-    echo "hs4l:   scripts/fetch-vendor.sh --verify"
+    echo "hs4l: rsync failed -- the mirror path or release layout may have moved." >&2
+    echo "hs4l: browse $MIRROR, copy usr/sbin/spyrus_util plus every NEEDED lib" >&2
+    echo "hs4l: (run 'readelf -d spyrus_util') into $DEST/, then:" >&2
+    echo "hs4l:   scripts/fetch-vendor.sh --verify" >&2
     exit 1
   }
 

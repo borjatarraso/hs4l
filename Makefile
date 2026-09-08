@@ -25,6 +25,6 @@ test:
 	python3 scripts/verify.py --self-test
 	python3 -m unittest discover -s tests
 check: test verify
-	@[ -d vendor/sysroot ] && scripts/fetch-vendor.sh --verify | tail -1 || echo "vendor/sysroot not fetched (make fetch)"
+	@if [ -d vendor/sysroot ]; then scripts/fetch-vendor.sh --verify -q; else echo "vendor/sysroot not fetched (make fetch); checksum self-test skipped"; fi
 clean:
 	rm -rf vendor/sysroot vendor/spyrus-corpus
