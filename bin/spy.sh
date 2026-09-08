@@ -1,12 +1,12 @@
 #!/bin/sh
 # hs4l -- spyrus_util wrapper
 #
-# Runs the Guralp ARM build of spyrus_util under qemu-user against a
+# Runs the the vendor ARM build of spyrus_util under qemu-user against a
 # SPYRUS LYNKS Series II token (USB 08df:0a00) on any Linux host.
 #
 # The vendor binaries are NOT shipped in this repo (see VENDOR-NOTICE.md).
 # Run  scripts/fetch-vendor.sh  once to populate  vendor/sysroot/  from the
-# public Guralp Platinum mirror, then use this wrapper exactly like the
+# public Platinum firmware mirror, then use this wrapper exactly like the
 # real spyrus_util:
 #
 #     bin/spy.sh --state

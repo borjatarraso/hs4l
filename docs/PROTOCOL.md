@@ -1,6 +1,6 @@
 # SPYCOS on the wire
 
-Notes recovered by reading the **un-stripped** Güralp ARM `spyrus_util` /
+Notes recovered by reading the **un-stripped** vendor ARM `spyrus_util` /
 `libspyrus.so.3` and watching the USB traffic. Enough to understand what the
 tool is doing; not a full protocol spec.
 

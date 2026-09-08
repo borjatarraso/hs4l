@@ -1,12 +1,12 @@
-# Güralp spyrus-utils — the GPL source parts
+# spyrus-utils — the GPL source parts
 
-These files are copyright Güralp Systems Ltd (authors Bob Dunlop and Laurence
-Withers) and are redistributed here unmodified under the licence each file
-states in its own header. They were retrieved on 2026-09-08 from Güralp's open
-rsync mirror, which is how Güralp distributes the Platinum firmware. Licence
+These files are redistributed unmodified, under the licence and copyright
+notice each one carries in its own header. They were retrieved on 2026-09-08
+from the open rsync mirror on which the firmware vendor publishes the Platinum
+firmware (host in `scripts/fetch-corpus.sh`). Licence
 texts: `COPYING.GPL-2` and `COPYING.GPL-3`.
 
-| file here | licence (from its own header) | origin on rsync://rsync.guralp.com | sha256 |
+| file here | licence (from its own header) | origin on the mirror | sha256 |
 |---|---|---|---|
 | include/spyrus.h | GPL-2 (2008-2020) | platinum-crosslib/CMG-DAS/include/spyrus.h | 288728c467a503c7… |
 | include/spyrus_dss.h | GPL-3 (2008-2012) | platinum-crosslib/CMG-DAS/include/spyrus_dss.h | cb1de89f8ad8b9a4… |
@@ -27,26 +27,26 @@ texts: `COPYING.GPL-2` and `COPYING.GPL-3`.
 - **include/legacy-2008/spyrus_int.h** — the internal header of the 2008
   library: every card command opcode, every request and response struct, PIN
   types and lengths, the label used for stored keys. This is the wire protocol
-  of the LYNKS Series II as Güralp implemented it. `legacy-2008/spyrus.h` is
+  of the LYNKS Series II as the vendor implemented it. `legacy-2008/spyrus.h` is
   the matching public header of that revision.
 - **scripts/cd11-spyrus-tool.sh** — the wrapper the Platinum web UI calls
   (`init_card`, `generate_keypair`, `start_keypair`); shows the exact
-  `spyrus_util` invocations and PIN handling Güralp uses.
+  `spyrus_util` invocations and PIN handling the vendor uses.
 - **scripts/0140-EAM-hw-config-usb-spyrus.sh** — first-boot provisioning of
   `/etc/spyrus` (creates `spyrus.local` and the 1024-bit DSA parameters).
 
 ## What is deliberately not here
 
 - Binaries (`spyrus_util`, `spyrus_test`, `libspyrus.so`, `spyrus.cgi`,
-  `spyrus_cs.ko`). They are built from the same GPL package but Güralp ships
+  `spyrus_cs.ko`). They are built from the same GPL package but the vendor ships
   no corresponding source or written offer, so redistributing them would
-  breach GPL section 3. `scripts/fetch-corpus.sh` fetches them from Güralp at
+  breach GPL section 3. `scripts/fetch-corpus.sh` fetches them from the vendor at
   install time instead.
 - Files with no licence notice (`etc/init.d/spyrus`, the udev rule, the web
   menu entry). The udev match is reproduced in this repo's own `udev/` rules.
-- Güralp helper libraries `libgslutil` and `libioline`: no licence markers,
+- Vendor helper libraries `libgslutil` and `libioline`: no licence markers,
   no published source; treated as proprietary.
 
-Güralp has not published the `spyrus-utils` source tree itself. Since the
-library is GPL-2, a request to Güralp support is the route to a fully
+The `spyrus-utils` source tree itself is not published. Since the
+library is GPL-2, a request to the vendor's support is the route to a fully
 self-built, binary-free `libspyrus`; see the main README.

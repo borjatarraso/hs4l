@@ -7,8 +7,9 @@ firmware run under `qemu-arm-static` against the raw USB pipe via `libusb`.
 
 > SPYRUS is defunct (absorbed by Route1 in 2021). There is no Linux driver
 > and the Windows middleware is gone from the public web. The one thing that
-> still works turned out to be a **seismograph vendor's firmware** — Güralp
-> Systems ship an ARM Linux tool, `spyrus_util`, that speaks the undocumented
+> still works turned out to be a **seismograph vendor's firmware**: its
+> Platinum digitiser rootfs ships an ARM Linux tool, `spyrus_util`, that
+> speaks the undocumented
 > SPYCOS protocol. hs4l wraps it so it runs on any Linux box.
 
 | | |
@@ -21,8 +22,8 @@ firmware run under `qemu-arm-static` against the raw USB pipe via `libusb`.
 
 ## ⚠️ Read first: the vendor binaries are not in this repo
 
-`spyrus_util` and `libspyrus` are **SPYRUS/Güralp proprietary** and are **not
-redistributed here**. `scripts/fetch-vendor.sh` pulls them from Güralp's
+`spyrus_util` and `libspyrus` are **SPYRUS / firmware-vendor proprietary** and are **not
+redistributed here**. `scripts/fetch-vendor.sh` pulls them from the vendor's
 **public** rsync mirror and checksums them. See
 **[VENDOR-NOTICE.md](VENDOR-NOTICE.md)**. Everything original in this repo
 (wrappers, docs, diagrams, examples) is BSD-3-Clause.
@@ -94,7 +95,7 @@ now, plus `dsaparam.pem.rejected` — the counter-example that draws `0x0a`.
 
 ```
 bin/spy.sh              wrapper: spyrus_util under qemu-user + libusb
-scripts/fetch-vendor.sh fetch vendor/sysroot from the public Guralp mirror
+scripts/fetch-vendor.sh fetch vendor/sysroot from the public firmware mirror
 scripts/verify.py       off-card SHA-1 DSA verify (pyca cryptography)
 scripts/setup-udev.sh   install the udev rule (group access)
 udev/                   the udev rule
@@ -120,9 +121,9 @@ material and bypasses no authentication. See VENDOR-NOTICE.md.
 BSD-3-Clause for the original work here (see [LICENSE](LICENSE)). Vendor
 binaries are not included and remain the property of their owners.
 
-## Native x86-64 build (no qemu) and the wider Güralp SPYRUS corpus
+## Native x86-64 build (no qemu) and the wider SPYRUS firmware corpus
 
-Güralp's open rsync server also carries an **x86-64** Platinum platform
+The vendor's open rsync server also carries an **x86-64** Platinum platform
 (`CMG-NAM64`) whose `spyrus_util` 2.1.0 is unstripped, has debug info, and
 runs directly on a 64-bit PC with its own loader and libraries:
 
@@ -131,25 +132,25 @@ scripts/fetch-corpus.sh          # mirrors every SPYRUS file for all 7 platforms
 bin/spy-native.sh --status       # same CLI as bin/spy.sh, no qemu-user needed
 ```
 
-`fetch-corpus.sh` populates `vendor/guralp-spyrus-corpus/` (git-ignored, with
+`fetch-corpus.sh` populates `vendor/spyrus-corpus/` (git-ignored, with
 its own `CHECKSUMS.sha256` and `INDEX.md`). Besides the binaries it brings the
 GPL-2 C headers — `spyrus.h`, `spyrus_dss.h` and, from the older `CMG-DCM-mk4`
 SDK, `spyrus_int.h` with every card opcode and wire struct — the GPL
-`spyrus_cs.ko` PCMCIA driver for the card-slot LYNKS, Güralp's udev rule,
+`spyrus_cs.ko` PCMCIA driver for the card-slot LYNKS, the vendor's udev rule,
 init script, first-boot provisioning script and web-UI CGI. The
-`libspyrus`/`spyrus-utils` *source* is not on Güralp's open-source page or
-rsync (the builder module is access-restricted and git.guralp.com no longer
-resolves); the library is GPL-2, so the source is obtainable from Güralp on
+`libspyrus`/`spyrus-utils` *source* is not on the vendor's open-source page or
+rsync (the builder module is access-restricted and their git host no longer
+resolves); the library is GPL-2, so the source is obtainable from the vendor on
 request.
 
 `libspyrus` keeps a use-lock at `/var/lock/spyrus.lck` and its config in
 `/etc/spyrus/`; if you first ran it as root, grant your user an ACL on both
 before using the native wrapper unprivileged.
 
-## GPL source parts from Güralp, included
+## GPL source parts included
 
-`third_party/guralp-gpl/` carries the parts of Güralp's spyrus-utils package
+`third_party/spyrus-gpl/` carries the parts of the vendor's spyrus-utils package
 that are distributed as source under an explicit GPL notice: the `libspyrus`
 public headers, the 2008 internal header with the full card command set, and
 the two provisioning scripts. Provenance, checksums and per-file licence are in
-`third_party/guralp-gpl/README.md`. Binaries stay out of the repo.
+`third_party/spyrus-gpl/README.md`. Binaries stay out of the repo.

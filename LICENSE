@@ -32,6 +32,6 @@ POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------
 NOTE: This license covers only the ORIGINAL work in this repository — the
 wrapper scripts, documentation, diagrams, examples and instructions. It does
-NOT cover the SPYRUS / Guralp Systems proprietary binaries (spyrus_util,
+NOT cover the SPYRUS / firmware-vendor proprietary binaries (spyrus_util,
 libspyrus, etc.), which are not distributed here and remain the property of
 their respective owners. See VENDOR-NOTICE.md.

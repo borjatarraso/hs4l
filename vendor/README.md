@@ -2,7 +2,7 @@
 
 This directory holds the **third-party ARM runtime** used to talk to the
 SPYRUS LYNKS Series II. It is intentionally **empty in git** — the SPYRUS /
-Guralp binaries are proprietary and are not redistributed by this project
+vendor binaries are proprietary and are not redistributed by this project
 (see [../VENDOR-NOTICE.md](../VENDOR-NOTICE.md)).
 
 Populate it once:

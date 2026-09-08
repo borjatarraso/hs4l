@@ -1,4 +1,4 @@
-# hs4l -- SHA-256 of the Guralp Platinum ARM vendor files this toolkit was
+# hs4l -- SHA-256 of the Platinum ARM vendor files this toolkit was
 # written against (Platinum "stable" CMG-DCM-mk4-eabi, June-2024 build).
 # Paths are relative to vendor/sysroot/ . scripts/fetch-vendor.sh checks these.
 # If your mirror release differs, the binaries may still work; regenerate this

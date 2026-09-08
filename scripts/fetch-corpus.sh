@@ -1,7 +1,7 @@
 #!/bin/sh
-# scripts/fetch-corpus.sh -- mirror every SPYRUS-related file Guralp publishes
+# scripts/fetch-corpus.sh -- mirror every SPYRUS-related file the firmware vendor publishes
 # on its open rsync server, for ALL Platinum platforms and modules, into
-# vendor/guralp-spyrus-corpus/<module>/<platform>/... (git-ignored).
+# vendor/spyrus-corpus/<module>/<platform>/... (git-ignored).
 #
 # What you get (per platform, where present):
 #   usr/sbin/spyrus_util, spyrus_test, cd11-spyrus-tool.sh   CLI tools
@@ -15,7 +15,7 @@
 # spyrus_util natively on a 64-bit PC without qemu (see bin/spy-native.sh).
 set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-DEST="$ROOT/vendor/guralp-spyrus-corpus"
+DEST="$ROOT/vendor/spyrus-corpus"
 HOST="${HS4L_RSYNC:-rsync://rsync.guralp.com}"
 command -v rsync >/dev/null 2>&1 || { echo "hs4l: rsync required." >&2; exit 127; }
 mkdir -p "$DEST"
@@ -34,6 +34,6 @@ for m in platinum-stable platinum-prerelease platinum-crosslib ctbto-prerelease;
   echo "hs4l:   $(wc -l < "$DEST/.files-$m") files"
 done
 if [ -f "$DEST/CHECKSUMS.sha256" ]; then
-  echo "hs4l: verifying against vendor/guralp-spyrus-corpus/CHECKSUMS.sha256"
+  echo "hs4l: verifying against vendor/spyrus-corpus/CHECKSUMS.sha256"
   (cd "$DEST" && sha256sum --quiet -c CHECKSUMS.sha256) && echo "hs4l: corpus OK"
 fi

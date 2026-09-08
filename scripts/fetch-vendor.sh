@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# hs4l -- fetch the vendor ARM runtime from the PUBLIC Guralp Platinum mirror.
+# hs4l -- fetch the vendor ARM runtime from the PUBLIC Platinum firmware mirror.
 #
-# This repo deliberately does NOT redistribute SPYRUS/Guralp proprietary
+# This repo deliberately does NOT redistribute SPYRUS / vendor proprietary
 # binaries (see VENDOR-NOTICE.md). Instead it pulls them, at your request,
-# from the same public rsync mirror Guralp publish their firmware on, and
+# from the same public rsync mirror the vendor publishes the firmware on, and
 # verifies them against CHECKSUMS.sha256 so you know you got the exact build
 # these instructions were written for.
 #
@@ -41,7 +41,7 @@ if [ "${1:-}" = "--verify" ]; then
   verify; exit $?
 fi
 
-echo "hs4l: fetching Guralp Platinum ARM rootfs (release >= 15781)"
+echo "hs4l: fetching Platinum ARM rootfs (release >= 15781)"
 echo "hs4l:   from   $MIRROR"
 echo "hs4l:   into   $DEST"
 echo
