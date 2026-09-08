@@ -50,3 +50,10 @@ If you have confirmed you may redistribute the vendor files (e.g. a licence,
 or they are already GPL/LGPL where applicable), drop them into
 `vendor/sysroot/` and delete the matching line from `.gitignore`. That is
 your call to make, not this project's default.
+
+## Source-form GPL files (in the repo)
+
+Only files carrying their own GPL notice are committed, under
+`third_party/guralp-gpl/`, with licence texts and provenance. Everything
+binary, and every file without a licence notice, remains fetch-at-install
+via `scripts/fetch-vendor.sh` / `scripts/fetch-corpus.sh`.

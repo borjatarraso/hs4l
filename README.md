@@ -145,3 +145,11 @@ request.
 `libspyrus` keeps a use-lock at `/var/lock/spyrus.lck` and its config in
 `/etc/spyrus/`; if you first ran it as root, grant your user an ACL on both
 before using the native wrapper unprivileged.
+
+## GPL source parts from Güralp, included
+
+`third_party/guralp-gpl/` carries the parts of Güralp's spyrus-utils package
+that are distributed as source under an explicit GPL notice: the `libspyrus`
+public headers, the 2008 internal header with the full card command set, and
+the two provisioning scripts. Provenance, checksums and per-file licence are in
+`third_party/guralp-gpl/README.md`. Binaries stay out of the repo.
