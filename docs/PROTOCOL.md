@@ -22,10 +22,19 @@ opcode; the **result code lands in word 4 (W4)**.
 ```
              sent            response        meaning
   W0 opcode  0000 0085       9000 0085       0x85 GenerateDSAKeyPair; 0x90 marker
+  W1         0000 0000       0000 0000       reserved
+  W2 offset  0000 0018       0000 0018       payload starts after the 24-byte header
+  W3 length  0000 0144       0000 0144       total block length (324 bytes)
   W4 RESULT  0000 0000       0000 000a       result code (0x0a here)
-  W7 index   0000 0001       0000 0001       key slot (1..9; slot 9 = EC)
-  W9.. data  0000 0400 ...   echoed          P (1024b) / Q (160b) / G (1024b)
+  W5         0000 0000       0000 0000       reserved
+  W6 len     0000 012c       echoed          payload length (300)
+  W7 index   0000 0002       echoed          key slot (1..9; slot 9 = EC)
+  W8 type    0000 000a       echoed          key type 0x0a = DSA
+  W9.. data  0000 0400 ...   echoed          P (1024b) / Q (0xa0 = 160b) / G (1024b)
 ```
+
+Commands with no input payload (`0x26` Get_Status, `0x25` personality list)
+send W2 = 0 and W3 = `0x18`; the card appends its output after the header.
 
 Opcodes seen: **`0x85` GenerateDSAKeyPair**, **`0x2f` LoadCertificate**
 (keygen auto-loads a `TEMPXXXX` placeholder cert carrying the new pubkey).
@@ -54,8 +63,18 @@ structural rejection (Invalid Header / State / NO PQG). See
 
 ## Crypto profile
 
-Classic slots are **DSA-1024 / SHA-1 (FIPS 186-2)**; slot 9 is EC. The card
-validates externally-supplied DSA domain parameters the FIPS 186-2 way (it
-wants the generation **seed + counter**), which is why bare OpenSSL-3
-parameters are rejected — let the card self-generate. Signatures are DSS:
-ASN.1 `SEQUENCE { INTEGER r, INTEGER s }`, each a 160-bit integer.
+Classic slots are **DSA-1024 / SHA-1 (FIPS 186-2)**; slot 9 is EC. The
+profile is fixed at **L = 1024, N = 160**. `libspyrus` hard-codes it: the
+Q block of the Generate_X payload is always written as `0x000000a0` (160
+bits) followed by `BN_bn2bin_fixed(q, buf, 20)`. OpenSSL 3 generates a
+**224-bit q** for 1024-bit parameters by default, so only the low 160 bits
+of q reach the card; that q' no longer divides p−1, the card's parameter
+check fails and it answers `0x0a`. Either let the card self-generate, or
+generate with `-pkeyopt qbits:160` (verified accepted; see
+TROUBLESHOOTING.md). Signatures are DSS: ASN.1 `SEQUENCE { INTEGER r,
+INTEGER s }`, each a 160-bit integer.
+
+The Sign command (`0x5b`) takes the 20-byte SHA-1 in the payload and
+returns `r` and `s` in two 40-byte fields (20 bytes used each); the library
+DER-wraps them. The Generate_X payload is `len, index, type (0x0a = DSA)`
+followed by three `bits, bytes...` blocks for P, Q, G.

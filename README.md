@@ -95,10 +95,12 @@ the real device node unchanged.
 
 Every `--keygen` returned result code `0x0a` (Execution Failure) — but the
 full command/response round-trip completed each time, so it was never a
-transport problem. The card validates externally supplied DSA parameters the
-**FIPS 186-2** way (it wants the generation seed + counter), and modern
-OpenSSL emits bare parameters. **Fix: don't pass `--dsaparam`; let the card
-self-generate.** Only word 4 of the response differs between fail and pass:
+transport problem. The card is **FIPS 186-2 only: L = 1024, N = 160**.
+OpenSSL 3 emits a **224-bit q** for 1024-bit DSA parameters, and `libspyrus`
+writes the Q block as a fixed 20 bytes, so the card received a truncated q
+that does not divide p−1 and refused. **Fix: don't pass `--dsaparam` (the
+card self-generates), or generate with `-pkeyopt qbits:160`.** Only word 4
+of the response differs between fail and pass:
 
 ![Response decode](docs/diagrams/response-decode.svg)
 
@@ -118,7 +120,9 @@ Verify with the public key alone (a one-byte change is rejected):
 ![DSA verify](docs/diagrams/dsa-verify.svg)
 
 `examples/` holds a real `pubkey.pem`, `msg.txt`, `sig.bin` you can verify
-now, plus `dsaparam.pem.rejected` — the counter-example that draws `0x0a`.
+now, plus `dsaparam.pem.rejected` (224-bit q, draws `0x0a`) and
+`dsaparam-1024-160.pem.accepted` (160-bit q, accepted) with the key and
+signature the card produced from it (`pubkey-slot2.pem`, `sig-slot2.bin`).
 
 ## Layout
 

@@ -4,6 +4,23 @@ All notable changes to hs4l are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions are git
 tags `vX.Y`.
 
+## [0.8] - 2026-09-08
+
+### Fixed
+- Root cause of `0x0a` on `--keygen --dsaparam` corrected. It is not
+  missing FIPS 186-2 seed/counter provenance: OpenSSL 3 emits a 224-bit q for
+  1024-bit DSA parameters, `libspyrus` writes the Q block as a fixed 160 bits
+  (`BN_bn2bin_fixed(q, 20)`), and the truncated q fails the card's parameter
+  check. Parameters generated with `-pkeyopt qbits:160` are accepted.
+  README, PROTOCOL.md, TROUBLESHOOTING.md and REINITIALIZE.md updated.
+
+### Added
+- `examples/dsaparam-1024-160.pem.accepted`, `examples/pubkey-slot2.pem`,
+  `examples/sig-slot2.bin`: host-generated 1024/160 parameters the card
+  accepted, and the key and signature it produced from them.
+- PROTOCOL.md: full header word layout (offset, length, result) and the Sign
+  payload format (SHA-1 in, r and s in 40-byte fields out).
+
 ## [0.7] - 2026-09-08
 
 ### Added

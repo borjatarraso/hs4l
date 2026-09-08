@@ -3,10 +3,19 @@
 Each of these cost real time; each is traced to a root cause.
 
 - **`--keygen` → `Execution Failure` (0x0a).** You passed `--dsaparam` from
-  modern OpenSSL. The card validates DSA parameters FIPS-186-2-style (seed +
-  counter provenance) and OpenSSL 3 emits none. **Fix: omit `--dsaparam`** and
-  let the card self-generate. The round-trip completing but W4 = `0x0a` is the
-  signature of this, not a transport fault.
+  OpenSSL 3, whose `dsaparam 1024` / `genpkey -pkeyopt pbits:1024` emit a
+  **224-bit q**. `libspyrus` only knows FIPS 186-2 (N = 160) and writes the Q
+  block as `0x000000a0` + `BN_bn2bin_fixed(q, 20)`, so the card receives the
+  low 160 bits of q, which no longer divide p−1, and refuses. **Fix: omit
+  `--dsaparam`** (the card generates its own parameters), or generate with
+  `openssl genpkey -genparam -algorithm DSA -pkeyopt pbits:1024 -pkeyopt qbits:160`
+  (verified: accepted in under 2 s, key signs and verifies —
+  `examples/dsaparam-1024-160.pem.accepted`, `examples/pubkey-slot2.pem`,
+  `examples/sig-slot2.bin`). OpenSSL 1.0.2, which the firmware ships, always
+  produced a 160-bit q, which is why the vendor's own init script could call
+  plain `openssl dsaparam 1024`. The round-trip completing but W4 = `0x0a` is
+  the signature of this, not a transport fault. Earlier versions of these
+  docs blamed missing FIPS 186-2 seed/counter provenance; that was wrong.
 
 - **`--pin` on keygen fails on a fresh card.** It triggers a cert/slot
   validation path that trips on an empty loose-mode card. **Omit `--pin` for

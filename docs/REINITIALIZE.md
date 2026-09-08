@@ -38,7 +38,16 @@ bin/spy.sh --keygen --index 1    # NO --dsaparam, NO --pin  (see TROUBLESHOOTING
 ```
 
 The card runs the FIPS 186-2 domain-parameter routine itself (~1 min; prints
-its counter and `h`).
+its counter and `h`). If you want host-generated parameters, they must have
+a **160-bit q**:
+
+```sh
+openssl genpkey -genparam -algorithm DSA -pkeyopt pbits:1024 -pkeyopt qbits:160 -out dsa.pem
+bin/spy.sh --keygen --index 1 --dsaparam dsa.pem
+```
+
+OpenSSL 3's default for 1024-bit parameters is a 224-bit q, which the
+library truncates and the card rejects with `0x0a`.
 
 ## 4. Export the public key
 
@@ -60,5 +69,5 @@ There is also `--request --index N --out csr.pem` for a CSR if you want a
 certificate over the on-card key.
 
 See `examples/` for a real `pubkey.pem` + `msg.txt` + `sig.bin` you can
-verify immediately, and `examples/dsaparam.pem.rejected` (the counter-example
-that draws `0x0a`).
+verify immediately, `examples/dsaparam.pem.rejected` (224-bit q, draws
+`0x0a`) and `examples/dsaparam-1024-160.pem.accepted` (160-bit q, accepted).
