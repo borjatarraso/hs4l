@@ -4,6 +4,17 @@ All notable changes to hs4l are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions are git
 tags `vX.Y`.
 
+## [0.2] - 2026-09-08
+
+### Fixed
+- `scripts/fetch-vendor.sh` did not fetch `lib/libz.so.1` and
+  `lib/libiso8601.so.1`, both `NEEDED` by `spyrus_util`/`libspyrus` and
+  living in `lib/` rather than `usr/lib/`; a fresh sysroot could not start.
+- `CHECKSUMS.sha256` now covers all 20 runtime files.
+
+### Added
+- `HS4L_SYSROOT` override for the sysroot location.
+
 ## [0.1] - 2026-09-08
 
 Initial public release.
