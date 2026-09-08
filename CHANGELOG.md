@@ -4,6 +4,20 @@ All notable changes to hs4l are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions are git
 tags `vX.Y`.
 
+## [0.5] - 2026-09-08
+
+### Added
+- `CHECKSUMS.corpus.sha256`: SHA-256 of all 158 files the corpus fetch
+  pulls (x86-64 and i386 builds, three ARM builds, GPL headers, scripts).
+- `docs/CORPUS-INDEX.md`: what each file in the corpus is and where it
+  comes from.
+- `HS4L_CORPUS` override for the corpus location.
+
+### Changed
+- `scripts/fetch-corpus.sh` verifies every file against the in-repo
+  checksums and exits non-zero on a mismatch; rsync listing failures are
+  reported instead of silently producing an empty tree.
+
 ## [0.4] - 2026-09-08
 
 ### Added
