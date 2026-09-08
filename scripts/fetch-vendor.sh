@@ -11,14 +11,15 @@
 #   scripts/fetch-vendor.sh --verify   # verify an existing vendor/sysroot only
 set -euo pipefail
 
+# shellcheck disable=SC1007  # CDPATH= is intentional: keep cd silent
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-DEST="$ROOT/vendor/sysroot"
+DEST="${HS4L_SYSROOT:-$ROOT/vendor/sysroot}"   # same override bin/spy.sh honours
 SUMS="$ROOT/CHECKSUMS.sha256"
 MIRROR="${HS4L_MIRROR:-rsync://rsync.guralp.com/platinum-stable/CMG-DCM-mk4-eabi}"
 
 verify() {
   [ -f "$SUMS" ] || { echo "hs4l: $SUMS missing"; return 1; }
-  local ok=0 miss=0 bad=0 line sum rel path got
+  local ok=0 miss=0 bad=0 sum rel path got
   while read -r sum rel; do
     case "$sum" in ''|\#*) continue ;; esac
     path="$DEST/$rel"
@@ -48,9 +49,11 @@ echo
 command -v rsync >/dev/null 2>&1 || { echo "hs4l: rsync required." >&2; exit 127; }
 mkdir -p "$DEST"
 
-# Only the paths spyrus_util actually needs (readelf -d). Pulling the whole
-# rootfs also works; this keeps it small. Add --include lines if a NEEDED
-# library turns out to be missing on your release.
+# Only the paths spyrus_util actually needs (readelf -d on it, libspyrus,
+# libioline-*, libusb-1.0, libssl/libcrypto): note libz and libiso8601 live in
+# lib/, not usr/lib/, on this rootfs. Pulling the whole rootfs also works; this
+# keeps it small. Add --include lines if a NEEDED library turns out to be
+# missing on your release.
 rsync -av --prune-empty-dirs \
   --include='usr/' --include='usr/sbin/' \
   --include='usr/sbin/spyrus_util' --include='usr/sbin/spyrus_test' \
@@ -67,6 +70,8 @@ rsync -av --prune-empty-dirs \
   --include='lib/libpthread.so.0' --include='lib/libpthread-*.so' \
   --include='lib/librt.so.1' --include='lib/librt-*.so' \
   --include='lib/libgcc_s.so.1' \
+  --include='lib/libz.so.1' --include='lib/libz.so.1.*' \
+  --include='lib/libiso8601.so.*' \
   --include='lib/libncursesw.so.5*' --include='lib/libreadline.so.*' \
   --include='lib/libhistory.so.*' --include='lib/libtinfo.so.*' \
   --exclude='*' \

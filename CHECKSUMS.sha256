@@ -1,13 +1,27 @@
 # hs4l -- SHA-256 of the Platinum ARM vendor files this toolkit was
-# written against (Platinum "stable" CMG-DCM-mk4-eabi, June-2024 build).
-# Paths are relative to vendor/sysroot/ . scripts/fetch-vendor.sh checks these.
-# If your mirror release differs, the binaries may still work; regenerate this
-# file with:  (cd vendor/sysroot && sha256sum usr/sbin/spyrus_util ...) 
+# written against (Platinum "stable" CMG-DCM-mk4-eabi, June-2024 build,
+# spyrus_util 2.1.5). Paths are relative to vendor/sysroot/ and cover every
+# regular file scripts/fetch-vendor.sh pulls (symlinks such as libz.so.1 are
+# not listed). scripts/fetch-vendor.sh --verify checks these.
+# If your mirror release differs, the binaries may still work; regenerate with:
+#   (cd vendor/sysroot && sha256sum usr/sbin/* usr/lib/*.so.* lib/*.so lib/*.so.*.*) | grep -v ' lib/.*\.so\.[0-9]*$'
 d78d56d4cf05faf2be39677adfb0e6411843b71815a8877b2a6bb4a06fac39ef  usr/sbin/spyrus_util
 177c2fe139bf96586e1f86811a426c0a32e9922ae5758556fa2849214cc5a3fd  usr/sbin/spyrus_test
 c9164e31d155e86b94678d00335638ab877bdcb47ad87bc6411b46db1942efa6  usr/sbin/cd11-spyrus-tool.sh
 c77447cf1cccdf03c2f849e93d7a89cf0f259d28c2defff8a685e32311b9c2b1  usr/lib/libspyrus.so.3.1
 6b9a68ba52f87e5f1f283acefb6690338f19f9bd76bfdf63e1c3c34d76ce5c7c  usr/lib/libgslutil.so.6.10
+337829a22c36fc8d62c254ced0f22adc484515052ce50ae7bd88b33927c7c2d0  usr/lib/libioline-consumer.so.1.1
+a31945b267167743cd3a0588aa98a8a8f002d960c02e5b5552568666ec059c7a  usr/lib/libioline-pcd.so.0.0
 9907a87421017c9d9247140022e4b3f4b66d79778e1d96502a11ed516a37d464  usr/lib/libusb-1.0.so.0.0.0
+0a6c983bbe70efd2d04afd3a6ab167112c2c1fa535ae02e75aaa1791a32fa76d  usr/lib/libusb-0.1.so.4
 b7a40aa171e30e26c7d3141b97affc42a0c447e7a57e9b7d8e95b9799c560318  usr/lib/libssl.so.1.0.0
 65c9d20a533bd53e573f8040504c5e320290d6596eaf9b3750d11ad726fb0790  usr/lib/libcrypto.so.1.0.0
+3e2b32c5c86eeba3893112181b29e340bea32aafd7ee61edf7c3e5732856beec  lib/ld-2.12.2.so
+c8b869dbe468239200071e55440a821a60a56c590fbb37f0025da4fc1b1edbaa  lib/libc-2.12.2.so
+50d08c22f9e0115d7718831531d6fadea93ef31d6c8df4714244c22dcc7128bb  lib/libdl-2.12.2.so
+851167fafe73646f1cdd64662832806afc1d35b4d0ed6f5d457482189889e87d  lib/libm-2.12.2.so
+7ef7084be55879a71ad8d17b8470e465c725143c339daa4dfd190691b0316c72  lib/libpthread-2.12.2.so
+ea43756949b5794ca224c8eed79742d2ae41293c41d96c74b82c2c37ac13027c  lib/librt-2.12.2.so
+dcfb3ee3da5510bbe5b873c73e114a5c05e4b4860b6c6add23958a7f1dc881a5  lib/libgcc_s.so.1
+6bed5fef4104ed4f4957fcf0c08ea41fa7714352abdec633bf626302b1dea3b8  lib/libiso8601.so.1.10
+9e0251fcf1fbec7cf893f673cb3b355ad525c3ff77f0362f612019dd1c1e1b38  lib/libz.so.1.2.3
