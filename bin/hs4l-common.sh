@@ -38,3 +38,30 @@ hs4l_sudo() {
   echo "hs4l: (run scripts/setup-udev.sh once to work without sudo, or set HS4L_SUDO=0)" >&2
   echo sudo
 }
+
+# Print the wrapper's own knobs (spyrus_util's help follows when it is there).
+#   $1  wrapper name    $2  runtime-location variable    $3  fetch-source variable
+hs4l_help() {
+  cat <<EOT
+$1 -- hs4l wrapper around the vendor's spyrus_util; every flag passes through.
+
+Environment:
+  $2
+  $3
+  HS4L_SUDO=1     always run the vendor tool under sudo
+  HS4L_SUDO=0     never sudo (fails if the token node, /var/lock/spyrus.lck or
+                  /etc/spyrus are not writable; scripts/setup-udev.sh fixes that)
+
+Verify a signature off-card:  python3 scripts/verify.py PUBKEY MESSAGE SIGNATURE
+Docs: README.md, docs/REINITIALIZE.md, docs/TROUBLESHOOTING.md
+
+EOT
+}
+
+# True when -h or --help is among the arguments.
+hs4l_wants_help() {
+  for a in "$@"; do
+    case "$a" in -h|--help) return 0 ;; esac
+  done
+  return 1
+}

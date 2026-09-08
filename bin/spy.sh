@@ -1,7 +1,7 @@
 #!/bin/sh
 # hs4l -- spyrus_util wrapper
 #
-# Runs the the vendor ARM build of spyrus_util under qemu-user against a
+# Runs the vendor ARM build of spyrus_util under qemu-user against a
 # SPYRUS LYNKS Series II token (USB 08df:0a00) on any Linux host.
 #
 # The vendor binaries are NOT shipped in this repo (see VENDOR-NOTICE.md).
@@ -18,7 +18,8 @@
 # Requires: qemu-arm-static (qemu-user-static). Runs unprivileged when the
 # token node, /var/lock/spyrus.lck and /etc/spyrus are writable by you
 # (scripts/setup-udev.sh sets that up); otherwise falls back to sudo.
-# HS4L_SUDO=1 forces sudo, HS4L_SUDO=0 forbids it.
+# HS4L_SUDO=1 forces sudo, HS4L_SUDO=0 forbids it. -h / --help prints the
+# wrapper's own environment knobs, then spyrus_util's help.
 
 set -eu
 
@@ -30,6 +31,18 @@ ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 # override with:  HS4L_SYSROOT=/some/rootfs bin/spy.sh ...
 SYS=${HS4L_SYSROOT:-"$ROOT/vendor/sysroot"}
 UTIL="$SYS/usr/sbin/spyrus_util"
+
+HELP=0
+if hs4l_wants_help "$@"; then
+  HELP=1
+  hs4l_help bin/spy.sh \
+    "HS4L_SYSROOT    ARM rootfs holding usr/sbin/spyrus_util (default vendor/sysroot)" \
+    "HS4L_MIRROR     rsync source for scripts/fetch-vendor.sh (default rsync://rsync.guralp.com/platinum-stable/CMG-DCM-mk4-eabi)"
+  if [ ! -x "$UTIL" ]; then
+    echo "spyrus_util's own help follows once the vendor runtime is fetched (scripts/fetch-vendor.sh)."
+    exit 0
+  fi
+fi
 
 if [ ! -x "$UTIL" ]; then
   echo "hs4l: vendor binary not found at $UTIL" >&2
@@ -47,7 +60,9 @@ if ! command -v qemu-arm-static >/dev/null 2>&1; then
   exit 127
 fi
 
-SUDO=$(hs4l_sudo)
+# --help does not touch the token, so never escalate for it.
+SUDO=
+[ "$HELP" = 1 ] || SUDO=$(hs4l_sudo)
 # shellcheck disable=SC2086  # $SUDO is empty or the single word "sudo"
 exec $SUDO env \
   QEMU_LD_PREFIX="$SYS" \
