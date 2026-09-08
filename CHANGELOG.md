@@ -4,6 +4,18 @@ All notable changes to hs4l are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions are git
 tags `vX.Y`.
 
+## [0.4] - 2026-09-08
+
+### Added
+- `bin/spy-native-getkey.sh`: exports a slot's public key with the x86-64
+  build. Its `spyrus_util` is 2.1.0 and its `--getkey` fails with
+  "Unable to unpack PEM" on the CRLF PEM that the ARM 2.1.5 build stores;
+  the script rebuilds the PEM from the `--get` hexdump instead.
+
+### Fixed
+- `scripts/verify.py` rejects non-DSA keys with a clear message and exits 2
+  on unreadable input instead of raising a traceback.
+
 ## [0.3] - 2026-09-08
 
 ### Added
