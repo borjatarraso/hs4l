@@ -1,0 +1,13 @@
+# hs4l -- SHA-256 of the Guralp Platinum ARM vendor files this toolkit was
+# written against (Platinum "stable" CMG-DCM-mk4-eabi, June-2024 build).
+# Paths are relative to vendor/sysroot/ . scripts/fetch-vendor.sh checks these.
+# If your mirror release differs, the binaries may still work; regenerate this
+# file with:  (cd vendor/sysroot && sha256sum usr/sbin/spyrus_util ...) 
+d78d56d4cf05faf2be39677adfb0e6411843b71815a8877b2a6bb4a06fac39ef  usr/sbin/spyrus_util
+177c2fe139bf96586e1f86811a426c0a32e9922ae5758556fa2849214cc5a3fd  usr/sbin/spyrus_test
+c9164e31d155e86b94678d00335638ab877bdcb47ad87bc6411b46db1942efa6  usr/sbin/cd11-spyrus-tool.sh
+c77447cf1cccdf03c2f849e93d7a89cf0f259d28c2defff8a685e32311b9c2b1  usr/lib/libspyrus.so.3.1
+6b9a68ba52f87e5f1f283acefb6690338f19f9bd76bfdf63e1c3c34d76ce5c7c  usr/lib/libgslutil.so.6.10
+9907a87421017c9d9247140022e4b3f4b66d79778e1d96502a11ed516a37d464  usr/lib/libusb-1.0.so.0.0.0
+b7a40aa171e30e26c7d3141b97affc42a0c447e7a57e9b7d8e95b9799c560318  usr/lib/libssl.so.1.0.0
+65c9d20a533bd53e573f8040504c5e320290d6596eaf9b3750d11ad726fb0790  usr/lib/libcrypto.so.1.0.0

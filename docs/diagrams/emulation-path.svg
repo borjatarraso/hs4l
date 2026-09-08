@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 300" width="820" height="300" font-family="ui-monospace,Menlo,Consolas,monospace" role="img" aria-label="The ARM binary spyrus_util, linking libspyrus and libusb, runs in qemu-arm-static on an x86-64 host. qemu-user forwards syscalls to the host kernel, so libusb USBDEVFS ioctls reach the real device node and travel over bulk endpoints to the SPYRUS token. The interface has no kernel driver, which is why libusb can claim it.">
+<rect x="0" y="0" width="820" height="300" fill="#0b0f13"/>
+<defs>
+<marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#8f8266"/></marker>
+<marker id="ag" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#f2b43a"/></marker>
+</defs>
+<rect x="14" y="30" width="250" height="244" rx="10" fill="#7fd0e0" fill-opacity="0.06" stroke="#7fd0e0"/>
+<text x="139" y="54" text-anchor="middle" fill="#7fd0e0" font-size="13" font-weight="600">qemu-arm-static (user-mode)</text>
+<rect x="34" y="70" width="210" height="60" rx="7" fill="#f2b43a" fill-opacity="0.10" stroke="#f2b43a"/>
+<text x="139" y="93" text-anchor="middle" fill="#f2b43a" font-size="12.5" font-weight="600">spyrus_util · ARM EABI5</text>
+<text x="139" y="112" text-anchor="middle" fill="#8f8266" font-size="11">un-stripped → symbols readable</text>
+<rect x="34" y="142" width="100" height="56" rx="6" fill="#e9ddc7" fill-opacity="0.05" stroke="#8f8266"/>
+<text x="84" y="166" text-anchor="middle" fill="#e9ddc7" font-size="11">libspyrus.so.3</text>
+<text x="84" y="184" text-anchor="middle" fill="#8f8266" font-size="10">SPYCOS engine</text>
+<rect x="144" y="142" width="100" height="56" rx="6" fill="#e9ddc7" fill-opacity="0.05" stroke="#8f8266"/>
+<text x="194" y="166" text-anchor="middle" fill="#e9ddc7" font-size="11">libusb-1.0</text>
+<text x="194" y="184" text-anchor="middle" fill="#8f8266" font-size="10">userspace USB</text>
+<text x="139" y="228" text-anchor="middle" fill="#8f8266" font-size="11">open() / ioctl(USBDEVFS_*) / read / write</text>
+<text x="139" y="248" text-anchor="middle" fill="#e9ddc7" font-size="11">passed through — not emulated</text>
+<rect x="298" y="86" width="214" height="150" rx="10" fill="#e9ddc7" fill-opacity="0.04" stroke="#8f8266"/>
+<text x="405" y="110" text-anchor="middle" fill="#e9ddc7" font-size="13" font-weight="600">x86-64 host kernel</text>
+<text x="405" y="140" text-anchor="middle" fill="#e9ddc7" font-size="12">USBDEVFS ioctls on</text>
+<text x="405" y="160" text-anchor="middle" fill="#f2b43a" font-size="12">/dev/bus/usb/001/&lt;dev&gt;</text>
+<text x="405" y="188" text-anchor="middle" fill="#8f8266" font-size="11">iface 00 driver = NONE</text>
+<text x="405" y="206" text-anchor="middle" fill="#4fd08a" font-size="11">→ libusb allowed to claim it</text>
+<rect x="548" y="76" width="258" height="170" rx="10" fill="#f2b43a" fill-opacity="0.08" stroke="#f2b43a" stroke-width="2"/>
+<text x="677" y="100" text-anchor="middle" fill="#f2b43a" font-size="13" font-weight="600">SPYRUS LYNKS Series II</text>
+<text x="677" y="122" text-anchor="middle" fill="#e9ddc7" font-size="12">USB 08df:0a00 · SPYCOS</text>
+<text x="677" y="150" text-anchor="middle" fill="#7fd0e0" font-size="12">EP 0x01 OUT (bulk) command</text>
+<text x="677" y="170" text-anchor="middle" fill="#4fd08a" font-size="12">EP 0x82 IN  (bulk) response</text>
+<text x="677" y="198" text-anchor="middle" fill="#8f8266" font-size="11">FIPS 140-2 L2 boundary</text>
+<text x="677" y="216" text-anchor="middle" fill="#8f8266" font-size="11">private key sealed inside</text>
+<line x1="264" y1="178" x2="298" y2="162" stroke="#8f8266" stroke-width="2" marker-end="url(#a)"/>
+<line x1="512" y1="161" x2="548" y2="161" stroke="#f2b43a" stroke-width="2.5" marker-end="url(#ag)"/>
+</svg>
