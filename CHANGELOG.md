@@ -4,6 +4,24 @@ All notable changes to hs4l are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions are git
 tags `vX.Y`.
 
+## [0.3] - 2026-09-08
+
+### Added
+- `bin/hs4l-common.sh`: finds the token's `/dev/bus/usb` node from sysfs and
+  decides whether sudo is needed (`HS4L_SUDO=0/1` overrides).
+- `scripts/setup-udev.sh`: `spyrus` group, udev rule with `TAG+="uaccess"`,
+  group-writable `/etc/spyrus` (2775) and `/var/lock/spyrus.lck`, and a
+  `tmpfiles.d` entry so the lock survives a reboot (`/var/lock` is a tmpfs).
+
+### Changed
+- `bin/spy.sh` and `bin/spy-native.sh` run unprivileged once the setup
+  script has been run; sudo is used only when the node, lock or config are
+  not writable, with a hint pointing at the setup script.
+
+### Fixed
+- An earlier sudo run left `/var/lock/spyrus.lck` and `/etc/spyrus` owned
+  by root, which broke every later unprivileged run with "Permission denied".
+
 ## [0.2] - 2026-09-08
 
 ### Fixed
