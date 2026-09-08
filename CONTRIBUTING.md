@@ -17,7 +17,9 @@ Never paste PINs, and be aware that `--status` prints the serial number.
 ## Changes
 
 - Shell must pass `shellcheck` (`bin/*.sh` and `scripts/fetch-corpus.sh`
-  are POSIX `sh`; the rest is bash). Python must run on 3.9+.
+  are POSIX `sh`; the rest is bash). Python must run on 3.9+ with the
+  standard library only. `make test` runs both plus `tests/`; keep it green
+  and add a test when you touch `scripts/verify.py`.
 - Do not add vendor binaries, or anything without an explicit licence
   notice, to the tree. See `VENDOR-NOTICE.md`; fetch-at-install is the rule.
 - Files under `third_party/spyrus-gpl/` are redistributed verbatim. Do not

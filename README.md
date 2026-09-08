@@ -75,6 +75,10 @@ bin/spy.sh --sign msg --index 1 --binary > sig.bin
 python3 scripts/verify.py pub.pem msg sig.bin             # VALID
 ```
 
+`bin/spy.sh --help` prints the wrapper's own environment variables
+(`HS4L_SYSROOT`, `HS4L_SUDO`, `HS4L_MIRROR`) and then `spyrus_util`'s usage;
+every other flag goes straight through to the vendor tool.
+
 Full walkthrough: **[docs/REINITIALIZE.md](docs/REINITIALIZE.md)**.
 
 ![Workflow: fetch, setup, init, keygen, getkey, sign, verify](docs/diagrams/workflow.svg)
@@ -119,6 +123,16 @@ Verify with the public key alone (a one-byte change is rejected):
 
 ![DSA verify](docs/diagrams/dsa-verify.svg)
 
+`scripts/verify.py` needs nothing beyond the Python standard library: it
+parses the PEM/DER public key and the signature itself and does the FIPS
+186-4 verification arithmetic, so no library's SHA-1/DSA deprecation policy
+gets a vote. It takes the signature either DER-encoded (as `--sign --binary`
+writes it) or as raw `r || s` (40 bytes), auto-detected (`--format der|raw`
+forces one). Exit status: **0** valid, **1** invalid, **2** usage or
+malformed/unreadable input. `python3 scripts/verify.py --self-test` checks
+the arithmetic against the known-answer vector the card produced for
+`examples/`.
+
 `examples/` holds a real `pubkey.pem`, `msg.txt`, `sig.bin` you can verify
 now, plus `dsaparam.pem.rejected` (224-bit q, draws `0x0a`) and
 `dsaparam-1024-160.pem.accepted` (160-bit q, accepted) with the key and
@@ -133,10 +147,11 @@ bin/spy-native-getkey.sh  public-key export for the native build (see below)
 bin/hs4l-common.sh      shared helper: run unprivileged or fall back to sudo
 scripts/fetch-vendor.sh fetch vendor/sysroot from the public firmware mirror
 scripts/fetch-corpus.sh fetch the whole SPYRUS firmware corpus (all 7 platforms)
-scripts/verify.py       off-card SHA-1 DSA verify (pyca cryptography)
+scripts/verify.py       off-card SHA-1 DSA verify, standard library only (--self-test)
 scripts/setup-udev.sh   udev rule + spyrus group + lock file / /etc/spyrus perms
 udev/                   the udev rule
-Makefile                make fetch / setup / status / verify / check
+Makefile                make fetch / setup / status / verify / test / check
+tests/                  unittest suite for verify.py (make test)
 .github/                device-report issue template
 docs/                   PROTOCOL · REINITIALIZE · TROUBLESHOOTING · CORPUS-INDEX + diagrams/
 examples/               real pubkey / message / signature + rejected params
@@ -148,8 +163,19 @@ VENDOR-NOTICE.md        what is not shipped, and why
 
 ## Requirements
 
-`qemu-user-static` (`qemu-arm-static`), `rsync`, Python 3 + `cryptography`,
+`qemu-user-static` (`qemu-arm-static`), `rsync`, Python 3.9+ (standard library only),
 `libusb` on the host, and a SPYRUS LYNKS Series II on USB.
+
+## Tests
+
+```sh
+make test     # shellcheck (when installed) + verify.py --self-test + python3 -m unittest discover -s tests
+make check    # make test + the example triple + vendor/sysroot checksum verify
+```
+
+Nothing in the test suite touches a token: it exercises the DSA arithmetic on
+a fixed 1024/160 key, the DER/raw signature and PEM/DER key decoders, and the
+verifier's exit-status contract.
 
 ## Legality
 

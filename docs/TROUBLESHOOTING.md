@@ -30,7 +30,8 @@ Each of these cost real time; each is traced to a root cause.
 - **OpenSSL 3 says `do_sigver_init: invalid digest` when verifying.** That is
   a **deprecation policy** blocking SHA-1+DSA, not a signature failure — it
   errors before doing any math, on good and bad input alike. Use a
-  legacy-tolerant verifier (`scripts/verify.py`, pyca/cryptography).
+  verifier with no such policy: `scripts/verify.py` does the DSA arithmetic
+  itself, standard library only.
 
 - **`errno 22` on a status read.** Benign quirk of qemu's ioctl translation;
   the payload still comes back.
@@ -54,8 +55,11 @@ Each of these cost real time; each is traced to a root cause.
   living in `lib/` (not `usr/lib`). Re-run `scripts/fetch-vendor.sh`;
   `CHECKSUMS.sha256` now covers all 20 files.
 
-- **`verify.py` refuses the key.** It only accepts DSA public keys and says
-  so; a missing file exits 2.
+- **`verify.py` refuses the key or signature.** It only accepts DSA public
+  keys (PEM or DER SubjectPublicKeyInfo) and says which OID it saw instead;
+  the signature must be DER `SEQUENCE { r, s }` or raw `r || s` (40 bytes).
+  Unreadable or malformed input exits 2, a bad signature exits 1. Run
+  `python3 scripts/verify.py --self-test` to rule out the interpreter.
 
 - **`qemu-arm-static: not found`.** Install the `qemu-user-static` package.
 
