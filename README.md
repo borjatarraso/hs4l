@@ -28,6 +28,26 @@ redistributed here**. `scripts/fetch-vendor.sh` pulls them from the vendor's
 **[VENDOR-NOTICE.md](VENDOR-NOTICE.md)**. Everything original in this repo
 (wrappers, docs, diagrams, examples) is BSD-3-Clause.
 
+## Supported devices
+
+hs4l drives whatever `libspyrus` drives. The library opens the token either
+over raw USB (`libusb`, vendor ID `08df`) or through the PCMCIA driver's
+`/dev/spyrus0` node, so the same commands apply to both form factors.
+
+| Device | Interface | Status |
+|---|---|---|
+| **SPYRUS LYNKS Series II, USB** ("Spyrus Inc" / "Lynks USB Interface", `08df:0a00`, part `3003-F0`) | USB, `libusb` | **Verified** — every step in this README was run on a real unit (serial `01:00:00:00:f0:00:18:4f`, firmware SPYCOS) |
+| Other LYNKS Series II USB units | USB, `libusb` | Expected to work: same USB ID, same firmware family; untested — reports welcome |
+| SPYRUS LYNKS Series II PC Card (PCMCIA/CardBus) | `spyrus_cs.ko` → `/dev/spyrus0` | Supported by `libspyrus`, **untested**. The GPL driver (`pcmcia:0244:0300`) is only published as `.ko` for the vendor's 2.6.31/2.6.36 kernels; a modern host needs its source, obtainable from the vendor under the GPL |
+| SPYRUS Rosetta (Series II/III smart cards and USB), Hydra PC, WorkSafe / Secure Pocket Drive | PKCS#11 / CCID / mass storage | **Not covered** — different protocols, nothing here talks to them |
+| Other Fortezza-family PC cards | PCMCIA | Unknown; `spyrus_cs.ko` binds only to `0244:0300` |
+
+Hosts: verified on x86-64 Fedora, both under `qemu-arm-static` (`bin/spy.sh`)
+and natively with the x86-64 build (`bin/spy-native.sh`). Any Linux with
+`qemu-user-static` should run the ARM build (aarch64 boards included);
+untested. If you have a unit that is not in this table, open an issue with
+the output of `lsusb -v -d 08df:` and `bin/spy.sh --status -D`.
+
 ## Quickstart
 
 ```sh
