@@ -1,5 +1,5 @@
 # hs4l -- SPYRUS LYNKS Series II (USB 08df:0a00)
 # Give the 'spyrus' group read+write so libusb can claim the raw pipe
 # without a per-boot chmod. Mirrors the vendor firmware's own 81-spyrus.rules.
-SUBSYSTEM=="usb", ATTRS{idVendor}=="08df", ATTRS{idProduct}=="0a00", GROUP="spyrus", MODE="0660"
-SUBSYSTEM=="usb", ATTR{manufacturer}=="Spyrus Inc", ATTR{product}=="Lynks USB Interface", GROUP="spyrus", MODE="0660"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="08df", ATTRS{idProduct}=="0a00", GROUP="spyrus", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTR{manufacturer}=="Spyrus Inc", ATTR{product}=="Lynks USB Interface", GROUP="spyrus", MODE="0660", TAG+="uaccess"
