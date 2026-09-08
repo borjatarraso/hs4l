@@ -28,7 +28,7 @@ opcode; the **result code lands in word 4 (W4)**.
   W4 RESULT  0000 0000       0000 000a       result code (0x0a here)
   W5         0000 0000       0000 0000       reserved
   W6 len     0000 012c       echoed          payload length (300)
-  W7 index   0000 0002       echoed          key slot (1..9; slot 9 = EC)
+  W7 index   0000 0002       echoed          key slot (1..9; slot 9 = EC P-256)
   W8 type    0000 000a       echoed          key type 0x0a = DSA
   W9.. data  0000 0400 ...   echoed          P (1024b) / Q (0xa0 = 160b) / G (1024b)
 ```
@@ -63,8 +63,24 @@ structural rejection (Invalid Header / State / NO PQG). See
 
 ## Crypto profile
 
-Classic slots are **DSA-1024 / SHA-1 (FIPS 186-2)**; slot 9 is EC. The
-profile is fixed at **L = 1024, N = 160**. `libspyrus` hard-codes it: the
+| slots | key | hash | signature |
+|---|---|---|---|
+| 1..8 | DSA-1024, q 160-bit (FIPS 186-2) | SHA-1 (20-byte digest in the Sign payload) | DER `SEQUENCE { r, s }`, 160-bit each |
+| 9 | EC P-256 (secp256r1 / prime256v1, id-ecPublicKey) | **SHA-256** (measured 2026-09-08) | DER `SEQUENCE { r, s }`, 256-bit each; verifies with `openssl dgst -sha256 -verify` |
+
+Slot 9 is the one surprise in the profile. Every document about the device
+says SHA-1, and the DSA slots do hash SHA-1; but the signature the P-256 slot
+puts on a body verifies under **SHA-256 only**. It was tested against SHA-1,
+SHA-224, SHA-256, SHA-384 and SHA-512, a SHA-1 digest zero-padded to 32
+bytes, and swapped r/s: exactly one candidate matched. The self-signed X.509
+root the card produced on that slot (declared `ecdsa-with-SHA256`,
+1.2.840.10045.4.3.2) verifies with plain `openssl verify`, no legacy
+tolerance needed; `examples/pubkey-slot9.pem`, `tbs-slot9.der` and
+`sig-slot9.bin` are that key, that certificate body and that signature.
+`scripts/verify.py` picks the hash from the key's algorithm OID for the
+same reason: the card gives no choice.
+
+The DSA profile is fixed at **L = 1024, N = 160**. `libspyrus` hard-codes it: the
 Q block of the Generate_X payload is always written as `0x000000a0` (160
 bits) followed by `BN_bn2bin_fixed(q, buf, 20)`. OpenSSL 3 generates a
 **224-bit q** for 1024-bit parameters by default, so only the low 160 bits

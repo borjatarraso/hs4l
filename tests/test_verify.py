@@ -5,6 +5,8 @@
 The DSA arithmetic is exercised on a fixed 1024/160 key built in-test from
 the FIPS 186-2 parameters the card generated for examples/pubkey.pem; the
 signing side lives here, in a few lines, because verify.py only verifies.
+The P-256 path is checked against the signature the card's slot 9 put on its
+own root certificate (examples/*-slot9.*), plus tampered and malformed copies.
 The CLI is exercised through subprocess for its exit-status contract.
 """
 import hashlib
@@ -238,6 +240,116 @@ class Cli(unittest.TestCase):
             with open(sig, "wb") as f:
                 f.write(sig_raw(r, s ^ 1))
             self.assertEqual(self.run_cli(key, os.path.join(EXAMPLES, "msg.txt"), sig).returncode, 1)
+
+
+class EllipticCurve(unittest.TestCase):
+    """Slot 9: ECDSA P-256 over SHA-256, the vector the card produced for its root."""
+    E = verify.KAT_EC
+
+    def ec_spki(self, curve_oid=verify.OID_P256, point=None):
+        if point is None:
+            point = b"\x04" + self.E["qx"].to_bytes(32, "big") + self.E["qy"].to_bytes(32, "big")
+        alg = tlv(0x30, tlv(0x06, verify.OID_EC_PUBKEY) + tlv(0x06, curve_oid))
+        return tlv(0x30, alg + tlv(0x03, b"\x00" + point))
+
+    def test_card_vector_verifies(self):
+        e = self.E
+        self.assertTrue(verify.ecdsa_verify(e["qx"], e["qy"], e["sha256"], e["r"], e["s"]))
+
+    def test_generator_and_key_on_curve(self):
+        self.assertTrue(verify.ec_on_curve(verify.P256_GX, verify.P256_GY))
+        self.assertTrue(verify.ec_on_curve(self.E["qx"], self.E["qy"]))
+        self.assertFalse(verify.ec_on_curve(self.E["qx"], self.E["qy"] ^ 1))
+
+    def test_tampered_digest_rejected(self):
+        e = self.E
+        d = bytearray(e["sha256"])
+        d[-1] ^= 0x80
+        self.assertFalse(verify.ecdsa_verify(e["qx"], e["qy"], bytes(d), e["r"], e["s"]))
+
+    def test_tampered_signature_rejected(self):
+        e = self.E
+        self.assertFalse(verify.ecdsa_verify(e["qx"], e["qy"], e["sha256"], e["r"] ^ 1, e["s"]))
+        self.assertFalse(verify.ecdsa_verify(e["qx"], e["qy"], e["sha256"], e["r"], e["s"] ^ 1))
+
+    def test_wrong_key_rejected(self):
+        e = self.E
+        self.assertFalse(verify.ecdsa_verify(verify.P256_GX, verify.P256_GY, e["sha256"], e["r"], e["s"]))
+
+    def test_out_of_range_r_s_rejected(self):
+        e, n = self.E, verify.P256_N
+        for bad_r, bad_s in ((0, e["s"]), (n, e["s"]), (e["r"], 0), (e["r"], n), (e["r"] + n, e["s"])):
+            self.assertFalse(verify.ecdsa_verify(e["qx"], e["qy"], e["sha256"], bad_r, bad_s))
+
+    def test_kat_matches_example_files(self):
+        e = self.E
+        with open(os.path.join(EXAMPLES, "pubkey-slot9.pem"), "rb") as f:
+            self.assertEqual(verify.load_public_key(f.read()), ("ec", e["qx"], e["qy"]))
+        with open(os.path.join(EXAMPLES, "tbs-slot9.der"), "rb") as f:
+            self.assertEqual(hashlib.sha256(f.read()).digest(), e["sha256"])
+        with open(os.path.join(EXAMPLES, "sig-slot9.bin"), "rb") as f:
+            self.assertEqual(verify.decode_signature(f.read(), verify.P256_N), (e["r"], e["s"]))
+
+    def test_raw_signature_is_64_bytes(self):
+        e = self.E
+        raw = e["r"].to_bytes(32, "big") + e["s"].to_bytes(32, "big")
+        self.assertEqual(verify.decode_signature(raw, verify.P256_N), (e["r"], e["s"]))
+        with self.assertRaises(verify.FormatError):
+            verify.decode_signature(raw[:40], verify.P256_N)
+
+    def test_key_pem_and_der(self):
+        der = self.ec_spki()
+        want = ("ec", self.E["qx"], self.E["qy"])
+        self.assertEqual(verify.load_public_key(der), want)
+        self.assertEqual(verify.load_public_key(pem(der)), want)
+        with self.assertRaises(verify.FormatError):
+            verify.load_dsa_public_key(der)
+
+    def test_key_rejections(self):
+        secp256k1 = bytes.fromhex("2b8104000a")
+        cases = {
+            "other curve": self.ec_spki(curve_oid=secp256k1),
+            "compressed point": self.ec_spki(point=b"\x02" + self.E["qx"].to_bytes(32, "big")),
+            "point off curve": self.ec_spki(point=b"\x04" + self.E["qx"].to_bytes(32, "big")
+                                            + (self.E["qy"] ^ 1).to_bytes(32, "big")),
+            "no curve": tlv(0x30, tlv(0x30, tlv(0x06, verify.OID_EC_PUBKEY)) + tlv(0x03, b"\x00\x04")),
+        }
+        for name, data in cases.items():
+            with self.subTest(name):
+                with self.assertRaises(verify.FormatError):
+                    verify.load_public_key(data)
+
+    def run_cli(self, *args):
+        return subprocess.run([sys.executable, VERIFY, *args], capture_output=True, text=True)
+
+    def test_cli_examples_valid(self):
+        r = self.run_cli(os.path.join(EXAMPLES, "pubkey-slot9.pem"), os.path.join(EXAMPLES, "tbs-slot9.der"),
+                         os.path.join(EXAMPLES, "sig-slot9.bin"))
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn("VALID", r.stdout)
+        self.assertIn("P-256", r.stdout)
+
+    def test_cli_one_byte_change_exits_1(self):
+        with open(os.path.join(EXAMPLES, "tbs-slot9.der"), "rb") as f:
+            tbs = bytearray(f.read())
+        tbs[-1] ^= 0x01
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "tbs.der")
+            with open(path, "wb") as f:
+                f.write(tbs)
+            r = self.run_cli(os.path.join(EXAMPLES, "pubkey-slot9.pem"), path, os.path.join(EXAMPLES, "sig-slot9.bin"))
+            self.assertEqual(r.returncode, 1)
+            self.assertIn("INVALID", r.stdout)
+
+    def test_cli_key_type_mismatch_exits_1(self):
+        # A DSA key against the P-256 signature (and vice versa): the DER
+        # decodes, r and s fall outside the other group's order, verdict INVALID.
+        r = self.run_cli(os.path.join(EXAMPLES, "pubkey.pem"), os.path.join(EXAMPLES, "tbs-slot9.der"),
+                         os.path.join(EXAMPLES, "sig-slot9.bin"))
+        self.assertEqual(r.returncode, 1)
+        r = self.run_cli(os.path.join(EXAMPLES, "pubkey-slot9.pem"), os.path.join(EXAMPLES, "msg.txt"),
+                         os.path.join(EXAMPLES, "sig.bin"))
+        self.assertEqual(r.returncode, 1)
 
 
 if __name__ == "__main__":

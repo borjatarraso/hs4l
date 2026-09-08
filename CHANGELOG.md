@@ -4,9 +4,14 @@ All notable changes to hs4l are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions are git
 tags `vX.Y`.
 
-## [Unreleased]
+## [0.9] - 2026-09-08
 
 ### Changed
+- Slot 9 is documented for what it is: an **EC P-256** key whose signatures
+  hash **SHA-256**, not SHA-1 like the DSA slots. Found while issuing the
+  first self-signed root on that slot: tested against every candidate hash,
+  only SHA-256 verifies; the root verifies with plain `openssl verify`.
+  PROTOCOL.md carries the per-slot table and the finding; README updated.
 - `scripts/verify.py` no longer needs pyca/cryptography: it parses the
   PEM/DER SubjectPublicKeyInfo and the DSS signature with a minimal DER
   reader and does the FIPS 186-4 verification arithmetic itself, standard
@@ -17,6 +22,16 @@ tags `vX.Y`.
   `fetch-vendor.sh --verify` behind a pipe into `tail`.
 
 ### Added
+- `scripts/verify.py` verifies ECDSA P-256 / SHA-256 as well, still standard
+  library only: the key's algorithm OID picks DSA/SHA-1 or P-256/SHA-256, the
+  way the card does; `--self-test` now covers a P-256 known-answer vector
+  from the card next to the DSA one.
+- `examples/pubkey-slot9.pem`, `examples/tbs-slot9.der`,
+  `examples/sig-slot9.bin`: the slot-9 key, the 374-byte body of the root
+  certificate it signed and the 71-byte DER signature; `make verify` keeps
+  the DSA triple, `openssl dgst -sha256 -verify` agrees on this one.
+- `tests/test_verify.py`: `EllipticCurve` class (vector, tampered digest and
+  signature, out-of-range r/s, non-P-256 curve refused, CLI exit codes).
 - `scripts/verify.py`: DER `SEQUENCE { r, s }` and raw `r || s` signatures,
   auto-detected (`--format der|raw` forces one); DER as well as PEM public
   keys; argparse `--help`; `--self-test` against the known-answer vector the

@@ -16,7 +16,7 @@ firmware run under `qemu-arm-static` against the raw USB pipe via `libusb`.
 |---|---|
 | Device | SPYRUS LYNKS Series II · USB `08df:0a00` · part `3003-F0` ©2005 |
 | Validation | FIPS 140-2 Level 2 · NIST CMVP #679 · OS: SPYCOS |
-| Crypto | on-chip DSA-1024 / SHA-1 (FIPS 186-2); slot 9 = EC |
+| Crypto | on-chip DSA-1024 / SHA-1 (FIPS 186-2) on slots 1..8; slot 9 = EC P-256 / SHA-256 |
 | Proven | keygen · sign · verify · CSR · reinitialise-from-scratch |
 | Host tested | x86-64 Fedora + `qemu-arm-static` + `libusb` |
 
@@ -126,17 +126,23 @@ Verify with the public key alone (a one-byte change is rejected):
 `scripts/verify.py` needs nothing beyond the Python standard library: it
 parses the PEM/DER public key and the signature itself and does the FIPS
 186-4 verification arithmetic, so no library's SHA-1/DSA deprecation policy
-gets a vote. It takes the signature either DER-encoded (as `--sign --binary`
-writes it) or as raw `r || s` (40 bytes), auto-detected (`--format der|raw`
-forces one). Exit status: **0** valid, **1** invalid, **2** usage or
-malformed/unreadable input. `python3 scripts/verify.py --self-test` checks
-the arithmetic against the known-answer vector the card produced for
-`examples/`.
+gets a vote. It handles both key types the card holds: a DSA key (slots
+1..8) means SHA-1 and DSA, an EC key (slot 9, P-256 only) means SHA-256 and
+ECDSA; the key's algorithm OID decides, because that is how the card
+decides. It takes the signature either DER-encoded (as `--sign --binary`
+writes it) or as raw `r || s` (40 bytes for DSA, 64 for P-256),
+auto-detected (`--format der|raw` forces one). Exit status: **0** valid,
+**1** invalid, **2** usage or malformed/unreadable input.
+`python3 scripts/verify.py --self-test` checks both arithmetics against the
+known-answer vectors the card produced for `examples/`.
 
 `examples/` holds a real `pubkey.pem`, `msg.txt`, `sig.bin` you can verify
 now, plus `dsaparam.pem.rejected` (224-bit q, draws `0x0a`) and
 `dsaparam-1024-160.pem.accepted` (160-bit q, accepted) with the key and
 signature the card produced from it (`pubkey-slot2.pem`, `sig-slot2.bin`).
+The slot-9 triple (`pubkey-slot9.pem`, `tbs-slot9.der`, `sig-slot9.bin`) is
+the P-256 key and the signature it put on its own root certificate body;
+`openssl dgst -sha256 -verify` agrees with `verify.py` on it.
 
 ## Layout
 
@@ -147,7 +153,7 @@ bin/spy-native-getkey.sh  public-key export for the native build (see below)
 bin/hs4l-common.sh      shared helper: run unprivileged or fall back to sudo
 scripts/fetch-vendor.sh fetch vendor/sysroot from the public firmware mirror
 scripts/fetch-corpus.sh fetch the whole SPYRUS firmware corpus (all 7 platforms)
-scripts/verify.py       off-card SHA-1 DSA verify, standard library only (--self-test)
+scripts/verify.py       off-card SHA-1/DSA and SHA-256/P-256 verify, standard library only
 scripts/setup-udev.sh   udev rule + spyrus group + lock file / /etc/spyrus perms
 udev/                   the udev rule
 Makefile                make fetch / setup / status / verify / test / check
@@ -174,8 +180,8 @@ make check    # make test + the example triple + vendor/sysroot checksum verify
 ```
 
 Nothing in the test suite touches a token: it exercises the DSA arithmetic on
-a fixed 1024/160 key, the DER/raw signature and PEM/DER key decoders, and the
-verifier's exit-status contract.
+a fixed 1024/160 key, the P-256 arithmetic on the slot-9 vector, the DER/raw
+signature and PEM/DER key decoders, and the verifier's exit-status contract.
 
 ## Legality
 
