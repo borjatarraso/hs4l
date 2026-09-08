@@ -4,6 +4,17 @@ All notable changes to hs4l are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions are git
 tags `vX.Y`.
 
+## [0.7] - 2026-09-08
+
+### Added
+- `docs/diagrams/architecture.svg`: the whole path from wrapper to token,
+  including host state, install-time fetch and off-card verification.
+- `docs/diagrams/workflow.svg`: the seven steps from a bare token to a
+  verified signature. Both are embedded in the README.
+- `Makefile` with `fetch`, `corpus`, `setup`, `status`, `state`, `list`,
+  `verify` and `check` (shellcheck + example verification + checksums).
+- GitHub issue template for device reports.
+
 ## [0.6] - 2026-09-08
 
 ### Added
