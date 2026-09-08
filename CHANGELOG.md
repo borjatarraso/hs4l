@@ -4,6 +4,45 @@ All notable changes to hs4l are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions are git
 tags `vX.Y`.
 
+## [Unreleased]
+
+### Changed
+- `scripts/verify.py` no longer needs pyca/cryptography: it parses the
+  PEM/DER SubjectPublicKeyInfo and the DSS signature with a minimal DER
+  reader and does the FIPS 186-4 verification arithmetic itself, standard
+  library only (Python 3.9+). Same verdicts, same exit codes (0 valid,
+  1 invalid, 2 usage or malformed input), every parse failure now says what
+  was wrong instead of tracing back.
+- `make check` builds on `make test` and no longer hides a failed
+  `fetch-vendor.sh --verify` behind a pipe into `tail`.
+
+### Added
+- `scripts/verify.py`: DER `SEQUENCE { r, s }` and raw `r || s` signatures,
+  auto-detected (`--format der|raw` forces one); DER as well as PEM public
+  keys; argparse `--help`; `--self-test` against the known-answer vector the
+  card produced for `examples/`; `-q` for exit status only.
+- `tests/test_verify.py` (unittest, standard library only) and `make test`:
+  shellcheck when installed, the verifier self-test and the unit tests.
+- `bin/spy.sh --help` / `-h` (and `bin/spy-native.sh`) print the wrapper's
+  own environment variables, then `spyrus_util`'s usage; the wrapper help
+  works before the vendor runtime is fetched and never escalates to sudo.
+- `scripts/fetch-vendor.sh --verify -q` lists only what is missing or
+  differs; the summary names the directory and says what to do about
+  missing or mismatched files; unknown options exit 2; `--help`.
+- `bin/spy-native-getkey.sh -h`; a non-numeric index is rejected up front.
+
+### Fixed
+- `scripts/setup-udev.sh` is idempotent: no `usermod` when the user is
+  already in `spyrus`, no rule reinstall or udev reload when the installed
+  rule is identical, re-login advice only when membership changed; a failed
+  `udevadm control --reload-rules` no longer silently skips the trigger.
+- `bin/spy-native-getkey.sh` reports `spy-native.sh`'s own failure (no
+  corpus, no token, wrong slot) instead of "slot does not hold a PEM": the
+  hexdump is captured before parsing, since POSIX `sh` has no `pipefail`.
+- `scripts/fetch-corpus.sh` names the module whose download failed instead
+  of exiting silently.
+- Error hints from the fetchers go to stderr; typo in `bin/spy.sh` header.
+
 ## [0.8] - 2026-09-08
 
 ### Fixed
