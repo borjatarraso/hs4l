@@ -7,17 +7,34 @@
 #  3. libspyrus needs to write its use-lock /var/lock/spyrus.lck and its config
 #     dir /etc/spyrus (spyrus.local): both made group 'spyrus' writable, and a
 #     tmpfiles.d entry recreates the lock file at boot (/var/lock is tmpfs).
+#
+# Safe to re-run: every step checks first and only changes what is not yet
+# in place, so it doubles as a repair tool after a sudo run left root-owned
+# files behind.
 set -euo pipefail
 # shellcheck disable=SC1007  # CDPATH= is intentional: keep cd silent
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 RULE="$ROOT/udev/81-hs4l-spyrus.rules"
-ME="${SUDO_USER:-$USER}"
+ME="${SUDO_USER:-${USER:-$(id -un)}}"
+[ -f "$RULE" ] || { echo "hs4l: $RULE missing; run from a full checkout" >&2; exit 1; }
+command -v udevadm >/dev/null 2>&1 || { echo "hs4l: udevadm not found; this script needs a udev-based Linux" >&2; exit 1; }
 
+RELOGIN=0
 getent group spyrus >/dev/null || sudo groupadd spyrus
-sudo usermod -aG spyrus "$ME"
+if id -nG "$ME" | tr ' ' '\n' | grep -qx spyrus; then
+  echo "hs4l: $ME already in group spyrus"
+else
+  sudo usermod -aG spyrus "$ME"
+  RELOGIN=1
+fi
 
-sudo install -m 0644 "$RULE" /etc/udev/rules.d/81-hs4l-spyrus.rules
-sudo udevadm control --reload-rules && sudo udevadm trigger --subsystem-match=usb
+if cmp -s "$RULE" /etc/udev/rules.d/81-hs4l-spyrus.rules; then
+  echo "hs4l: udev rule already installed"
+else
+  sudo install -m 0644 "$RULE" /etc/udev/rules.d/81-hs4l-spyrus.rules
+  sudo udevadm control --reload-rules
+  sudo udevadm trigger --subsystem-match=usb
+fi
 
 sudo mkdir -p /etc/spyrus
 sudo chgrp -R spyrus /etc/spyrus
@@ -31,5 +48,9 @@ if [ -d /etc/tmpfiles.d ]; then
     | sudo tee /etc/tmpfiles.d/hs4l-spyrus.conf >/dev/null
 fi
 
-echo "hs4l: done. Log out/in (or 'newgrp spyrus') so group membership applies, then re-plug the token."
+if [ "$RELOGIN" = 1 ]; then
+  echo "hs4l: done. Log out/in (or 'newgrp spyrus') so group membership applies, then re-plug the token."
+else
+  echo "hs4l: done; nothing else to do. Re-plug the token if it was already connected."
+fi
 echo "hs4l: check:  ls -l /dev/bus/usb/*/*  shows group 'spyrus' on 08df:0a00;  bin/spy.sh --status  runs without sudo"
