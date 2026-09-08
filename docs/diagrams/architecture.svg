@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 590" width="960" height="590" font-family="ui-monospace,Menlo,Consolas,monospace" role="img" aria-label="How hs4l works end to end. A wrapper (bin/spy.sh or bin/spy-native.sh) decides whether sudo is needed, then runs the vendor spyrus_util either under qemu-arm-static from vendor/sysroot or natively from the x86-64 corpus. spyrus_util links libspyrus and libusb, which talk through the kernel usbfs node /dev/bus/usb (made group-accessible by the udev rule) to the SPYRUS LYNKS Series II token over USB bulk endpoints. libspyrus keeps a use-lock and config under /var/lock and /etc/spyrus. The vendor files are fetched at install time from the public firmware mirror into git-ignored vendor directories and verified against checksums. Signatures made on the card are verified off-card by scripts/verify.py.">
+<rect x="0" y="0" width="960" height="590" fill="#0b0f13"/>
+<defs>
+<marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#8f8266"/></marker>
+<marker id="ag" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#f2b43a"/></marker>
+<marker id="ac" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#7fd0e0"/></marker>
+<marker id="agr" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#4fd08a"/></marker>
+</defs>
+
+<!-- A: wrapper -->
+<rect x="14" y="96" width="166" height="132" rx="10" fill="#7fd0e0" fill-opacity="0.06" stroke="#7fd0e0"/>
+<text x="97" y="120" text-anchor="middle" fill="#7fd0e0" font-size="13" font-weight="600">you</text>
+<text x="97" y="142" text-anchor="middle" fill="#e9ddc7" font-size="11.5">bin/spy.sh …</text>
+<text x="97" y="160" text-anchor="middle" fill="#e9ddc7" font-size="11.5">bin/spy-native.sh …</text>
+<text x="97" y="184" text-anchor="middle" fill="#8f8266" font-size="10">hs4l-common.sh finds</text>
+<text x="97" y="198" text-anchor="middle" fill="#8f8266" font-size="10">08df:0a00 in /sys and</text>
+<text x="97" y="212" text-anchor="middle" fill="#8f8266" font-size="10">adds sudo only if needed</text>
+
+<!-- B1: qemu runtime -->
+<rect x="214" y="30" width="256" height="118" rx="10" fill="#7fd0e0" fill-opacity="0.06" stroke="#7fd0e0"/>
+<text x="342" y="52" text-anchor="middle" fill="#7fd0e0" font-size="12.5" font-weight="600">qemu-arm-static · vendor/sysroot</text>
+<rect x="230" y="64" width="224" height="30" rx="6" fill="#f2b43a" fill-opacity="0.10" stroke="#f2b43a"/>
+<text x="342" y="84" text-anchor="middle" fill="#f2b43a" font-size="11.5" font-weight="600">spyrus_util 2.1.5 · ARM EABI5</text>
+<rect x="230" y="102" width="106" height="34" rx="6" fill="#e9ddc7" fill-opacity="0.05" stroke="#8f8266"/>
+<text x="283" y="123" text-anchor="middle" fill="#e9ddc7" font-size="10.5">libspyrus.so.3</text>
+<rect x="348" y="102" width="106" height="34" rx="6" fill="#e9ddc7" fill-opacity="0.05" stroke="#8f8266"/>
+<text x="401" y="123" text-anchor="middle" fill="#e9ddc7" font-size="10.5">libusb-1.0</text>
+
+<!-- B2: native runtime -->
+<rect x="214" y="176" width="256" height="118" rx="10" fill="#7fd0e0" fill-opacity="0.06" stroke="#7fd0e0"/>
+<text x="342" y="198" text-anchor="middle" fill="#7fd0e0" font-size="12.5" font-weight="600">native ld.so · spyrus-corpus</text>
+<rect x="230" y="210" width="224" height="30" rx="6" fill="#f2b43a" fill-opacity="0.10" stroke="#f2b43a"/>
+<text x="342" y="230" text-anchor="middle" fill="#f2b43a" font-size="11.5" font-weight="600">spyrus_util 2.1.0 · x86-64</text>
+<rect x="230" y="248" width="106" height="34" rx="6" fill="#e9ddc7" fill-opacity="0.05" stroke="#8f8266"/>
+<text x="283" y="269" text-anchor="middle" fill="#e9ddc7" font-size="10.5">libspyrus.so.3</text>
+<rect x="348" y="248" width="106" height="34" rx="6" fill="#e9ddc7" fill-opacity="0.05" stroke="#8f8266"/>
+<text x="401" y="269" text-anchor="middle" fill="#e9ddc7" font-size="10.5">libusb-1.0</text>
+
+<!-- C: kernel -->
+<rect x="504" y="86" width="196" height="152" rx="10" fill="#e9ddc7" fill-opacity="0.04" stroke="#8f8266"/>
+<text x="602" y="110" text-anchor="middle" fill="#e9ddc7" font-size="13" font-weight="600">Linux kernel · usbfs</text>
+<text x="602" y="136" text-anchor="middle" fill="#f2b43a" font-size="11.5">/dev/bus/usb/BBB/DDD</text>
+<text x="602" y="158" text-anchor="middle" fill="#8f8266" font-size="10.5">udev/81-hs4l-spyrus.rules</text>
+<text x="602" y="172" text-anchor="middle" fill="#8f8266" font-size="10.5">group spyrus 0660 + uaccess</text>
+<text x="602" y="198" text-anchor="middle" fill="#8f8266" font-size="10.5">interface driver = NONE</text>
+<text x="602" y="214" text-anchor="middle" fill="#4fd08a" font-size="10.5">→ libusb may claim it</text>
+
+<!-- D: token -->
+<rect x="734" y="70" width="212" height="184" rx="10" fill="#f2b43a" fill-opacity="0.08" stroke="#f2b43a" stroke-width="2"/>
+<text x="840" y="94" text-anchor="middle" fill="#f2b43a" font-size="13" font-weight="600">SPYRUS LYNKS Series II</text>
+<text x="840" y="114" text-anchor="middle" fill="#e9ddc7" font-size="11.5">USB 08df:0a00 · SPYCOS</text>
+<text x="840" y="142" text-anchor="middle" fill="#7fd0e0" font-size="11.5">EP 0x01 OUT (bulk) command</text>
+<text x="840" y="160" text-anchor="middle" fill="#4fd08a" font-size="11.5">EP 0x82 IN  (bulk) response</text>
+<text x="840" y="188" text-anchor="middle" fill="#8f8266" font-size="10.5">DSA-1024 keys made on-chip</text>
+<text x="840" y="204" text-anchor="middle" fill="#8f8266" font-size="10.5">private key never leaves</text>
+<text x="840" y="232" text-anchor="middle" fill="#8f8266" font-size="10.5">FIPS 140-2 L2 boundary</text>
+
+<!-- E: libspyrus state -->
+<rect x="214" y="332" width="256" height="96" rx="10" fill="#e07070" fill-opacity="0.06" stroke="#e07070"/>
+<text x="342" y="354" text-anchor="middle" fill="#e07070" font-size="12.5" font-weight="600">libspyrus host state</text>
+<text x="342" y="376" text-anchor="middle" fill="#e9ddc7" font-size="11">/var/lock/spyrus.lck   use-lock</text>
+<text x="342" y="394" text-anchor="middle" fill="#e9ddc7" font-size="11">/etc/spyrus/spyrus.local   config</text>
+<text x="342" y="414" text-anchor="middle" fill="#8f8266" font-size="10">group-writable via scripts/setup-udev.sh</text>
+
+<!-- F: fetch -->
+<rect x="14" y="458" width="690" height="116" rx="10" fill="#4fd08a" fill-opacity="0.05" stroke="#4fd08a"/>
+<text x="359" y="480" text-anchor="middle" fill="#4fd08a" font-size="12.5" font-weight="600">install time · nothing proprietary in git</text>
+<text x="30" y="504" fill="#8f8266" font-size="10.5">public firmware mirror (rsync)</text>
+<text x="30" y="524" fill="#e9ddc7" font-size="10.5">scripts/fetch-vendor.sh  → vendor/sysroot/        20 files · CHECKSUMS.sha256</text>
+<text x="30" y="542" fill="#e9ddc7" font-size="10.5">scripts/fetch-corpus.sh  → vendor/spyrus-corpus/  158 files · CHECKSUMS.corpus.sha256</text>
+<text x="30" y="562" fill="#8f8266" font-size="10.5">both directories are git-ignored; only the GPL headers/scripts live in third_party/</text>
+
+<!-- G: off-card verify -->
+<rect x="504" y="332" width="442" height="120" rx="10" fill="#e9ddc7" fill-opacity="0.04" stroke="#8f8266"/>
+<text x="725" y="354" text-anchor="middle" fill="#e9ddc7" font-size="12.5" font-weight="600">off-card verification (host only)</text>
+<text x="520" y="380" fill="#e9ddc7" font-size="10.5">pub.pem   ← bin/spy.sh --getkey --index 1</text>
+<text x="520" y="398" fill="#e9ddc7" font-size="10.5">sig.bin   ← bin/spy.sh --sign msg --index 1 --binary</text>
+<text x="520" y="424" fill="#7fd0e0" font-size="11">python3 scripts/verify.py pub.pem msg sig.bin</text>
+<text x="520" y="442" fill="#4fd08a" font-size="11">VALID · DSA/SHA-1 (FIPS 186-2) via pyca/cryptography</text>
+
+<!-- arrows -->
+<line x1="180" y1="150" x2="214" y2="98" stroke="#7fd0e0" stroke-width="2" marker-end="url(#ac)"/>
+<line x1="180" y1="176" x2="214" y2="230" stroke="#7fd0e0" stroke-width="2" marker-end="url(#ac)"/>
+<line x1="470" y1="120" x2="504" y2="150" stroke="#8f8266" stroke-width="2" marker-end="url(#a)"/>
+<line x1="470" y1="250" x2="504" y2="200" stroke="#8f8266" stroke-width="2" marker-end="url(#a)"/>
+<line x1="700" y1="162" x2="734" y2="162" stroke="#f2b43a" stroke-width="2.5" marker-end="url(#ag)"/>
+<line x1="342" y1="294" x2="342" y2="332" stroke="#e07070" stroke-width="2" marker-end="url(#a)"/>
+<line x1="487" y1="458" x2="487" y2="300" stroke="#4fd08a" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#agr)"/>
+<text x="480" y="447" text-anchor="end" fill="#4fd08a" font-size="10">populates both runtimes ↑</text>
+<line x1="840" y1="254" x2="840" y2="332" stroke="#8f8266" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#a)"/>
+<text x="850" y="298" fill="#8f8266" font-size="10">signature out</text>
+<text x="20" y="34" fill="#8f8266" font-size="10.5">hs4l · how it works</text>
+</svg>

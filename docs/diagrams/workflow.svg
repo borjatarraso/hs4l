@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 330" width="960" height="330" font-family="ui-monospace,Menlo,Consolas,monospace" role="img" aria-label="The hs4l workflow in seven steps: fetch the vendor runtime, run setup-udev.sh, initialise the token with --init --loose and two PINs, generate a DSA key on-chip with --keygen (no --dsaparam), export the public key with --getkey, sign a file with --sign --binary, and verify off-card with scripts/verify.py which prints VALID.">
+<rect x="0" y="0" width="960" height="330" fill="#0b0f13"/>
+<defs>
+<marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#8f8266"/></marker>
+</defs>
+<text x="20" y="30" fill="#8f8266" font-size="10.5">hs4l · from a bare token to a verified signature</text>
+
+<!-- row 1 -->
+<rect x="14" y="48" width="220" height="104" rx="9" fill="#4fd08a" fill-opacity="0.06" stroke="#4fd08a"/>
+<text x="26" y="70" fill="#4fd08a" font-size="11" font-weight="600">1 · fetch the runtime</text>
+<text x="26" y="92" fill="#e9ddc7" font-size="10.5">scripts/fetch-vendor.sh</text>
+<text x="26" y="112" fill="#8f8266" font-size="10">20 files from the public mirror,</text>
+<text x="26" y="126" fill="#8f8266" font-size="10">verified against CHECKSUMS.sha256</text>
+<text x="26" y="142" fill="#8f8266" font-size="10">(+ apt install qemu-user-static)</text>
+
+<rect x="250" y="48" width="220" height="104" rx="9" fill="#4fd08a" fill-opacity="0.06" stroke="#4fd08a"/>
+<text x="262" y="70" fill="#4fd08a" font-size="11" font-weight="600">2 · no-sudo access</text>
+<text x="262" y="92" fill="#e9ddc7" font-size="10.5">scripts/setup-udev.sh</text>
+<text x="262" y="112" fill="#8f8266" font-size="10">udev rule, spyrus group,</text>
+<text x="262" y="126" fill="#8f8266" font-size="10">lock file + /etc/spyrus perms</text>
+<text x="262" y="142" fill="#8f8266" font-size="10">log out / in once</text>
+
+<rect x="486" y="48" width="220" height="104" rx="9" fill="#e07070" fill-opacity="0.07" stroke="#e07070"/>
+<text x="498" y="70" fill="#e07070" font-size="11" font-weight="600">3 · reinitialise (wipes it)</text>
+<text x="498" y="92" fill="#e9ddc7" font-size="10.5">bin/spy.sh --init --loose \</text>
+<text x="498" y="106" fill="#e9ddc7" font-size="10.5">  --sso-pin 1234 --user-pin 1234</text>
+<text x="498" y="126" fill="#8f8266" font-size="10">type 'yes'; no old PIN needed</text>
+<text x="498" y="142" fill="#8f8266" font-size="10">documented SPYCOS zeroize path</text>
+
+<rect x="722" y="48" width="224" height="104" rx="9" fill="#f2b43a" fill-opacity="0.08" stroke="#f2b43a"/>
+<text x="734" y="70" fill="#f2b43a" font-size="11" font-weight="600">4 · key on-chip</text>
+<text x="734" y="92" fill="#e9ddc7" font-size="10.5">bin/spy.sh --keygen --index 1</text>
+<text x="734" y="112" fill="#8f8266" font-size="10">DSA-1024 / SHA-1 (FIPS 186-2)</text>
+<text x="734" y="126" fill="#8f8266" font-size="10">NO --dsaparam (card rejects bare</text>
+<text x="734" y="140" fill="#8f8266" font-size="10">OpenSSL params, rc 0x0a)</text>
+
+<!-- row 2 -->
+<rect x="14" y="196" width="220" height="104" rx="9" fill="#7fd0e0" fill-opacity="0.06" stroke="#7fd0e0"/>
+<text x="26" y="218" fill="#7fd0e0" font-size="11" font-weight="600">5 · export public key</text>
+<text x="26" y="240" fill="#e9ddc7" font-size="10.5">bin/spy.sh --getkey --index 1 \</text>
+<text x="26" y="254" fill="#e9ddc7" font-size="10.5">  &gt; pub.pem</text>
+<text x="26" y="274" fill="#8f8266" font-size="10">native: bin/spy-native-getkey.sh</text>
+<text x="26" y="288" fill="#8f8266" font-size="10">(2.1.0 can't parse the slot PEM)</text>
+
+<rect x="250" y="196" width="220" height="104" rx="9" fill="#7fd0e0" fill-opacity="0.06" stroke="#7fd0e0"/>
+<text x="262" y="218" fill="#7fd0e0" font-size="11" font-weight="600">6 · sign on the card</text>
+<text x="262" y="240" fill="#e9ddc7" font-size="10.5">bin/spy.sh --sign msg --index 1 \</text>
+<text x="262" y="254" fill="#e9ddc7" font-size="10.5">  --binary &gt; sig.bin</text>
+<text x="262" y="274" fill="#8f8266" font-size="10">DER { r, s }, 46-48 bytes</text>
+<text x="262" y="288" fill="#8f8266" font-size="10">hash + sign happen inside SPYCOS</text>
+
+<rect x="486" y="196" width="220" height="104" rx="9" fill="#7fd0e0" fill-opacity="0.06" stroke="#7fd0e0"/>
+<text x="498" y="218" fill="#7fd0e0" font-size="11" font-weight="600">7 · verify off-card</text>
+<text x="498" y="240" fill="#e9ddc7" font-size="10.5">python3 scripts/verify.py \</text>
+<text x="498" y="254" fill="#e9ddc7" font-size="10.5">  pub.pem msg sig.bin</text>
+<text x="498" y="274" fill="#8f8266" font-size="10">pyca/cryptography (OpenSSL 3</text>
+<text x="498" y="288" fill="#8f8266" font-size="10">refuses DSA+SHA-1 by policy)</text>
+
+<rect x="722" y="196" width="224" height="104" rx="9" fill="#4fd08a" fill-opacity="0.10" stroke="#4fd08a" stroke-width="2"/>
+<text x="834" y="240" text-anchor="middle" fill="#4fd08a" font-size="16" font-weight="700">VALID</text>
+<text x="834" y="264" text-anchor="middle" fill="#e9ddc7" font-size="10.5">exit 0 · tampered → INVALID (1)</text>
+<text x="834" y="284" text-anchor="middle" fill="#8f8266" font-size="10">examples/ holds a real triple</text>
+
+<!-- arrows -->
+<line x1="234" y1="100" x2="250" y2="100" stroke="#8f8266" stroke-width="2" marker-end="url(#a)"/>
+<line x1="470" y1="100" x2="486" y2="100" stroke="#8f8266" stroke-width="2" marker-end="url(#a)"/>
+<line x1="706" y1="100" x2="722" y2="100" stroke="#8f8266" stroke-width="2" marker-end="url(#a)"/>
+<path d="M834,152 L834,174 L124,174 L124,196" fill="none" stroke="#8f8266" stroke-width="2" marker-end="url(#a)"/>
+<line x1="234" y1="248" x2="250" y2="248" stroke="#8f8266" stroke-width="2" marker-end="url(#a)"/>
+<line x1="470" y1="248" x2="486" y2="248" stroke="#8f8266" stroke-width="2" marker-end="url(#a)"/>
+<line x1="706" y1="248" x2="722" y2="248" stroke="#8f8266" stroke-width="2" marker-end="url(#a)"/>
+</svg>

@@ -77,7 +77,11 @@ python3 scripts/verify.py pub.pem msg sig.bin             # VALID
 
 Full walkthrough: **[docs/REINITIALIZE.md](docs/REINITIALIZE.md)**.
 
+![Workflow: fetch, setup, init, keygen, getkey, sign, verify](docs/diagrams/workflow.svg)
+
 ## How it works
+
+![Architecture: wrapper, qemu or native runtime, kernel usbfs, token, host state, fetch, off-card verify](docs/diagrams/architecture.svg)
 
 The token's USB interface is vendor-specific with **no kernel driver**, so
 `libusb` claims it from userspace. `spyrus_util` is a 32-bit ARM binary that
@@ -128,6 +132,8 @@ scripts/fetch-corpus.sh fetch the whole SPYRUS firmware corpus (all 7 platforms)
 scripts/verify.py       off-card SHA-1 DSA verify (pyca cryptography)
 scripts/setup-udev.sh   udev rule + spyrus group + lock file / /etc/spyrus perms
 udev/                   the udev rule
+Makefile                make fetch / setup / status / verify / check
+.github/                device-report issue template
 docs/                   PROTOCOL · REINITIALIZE · TROUBLESHOOTING · CORPUS-INDEX + diagrams/
 examples/               real pubkey / message / signature + rejected params
 third_party/spyrus-gpl/ GPL-licensed vendor headers + scripts, with provenance

@@ -1,0 +1,25 @@
+# hs4l -- convenience targets; every one is a plain script call you can run by hand.
+.PHONY: help fetch corpus setup status state list verify check clean
+help:
+	@echo "make fetch    scripts/fetch-vendor.sh   ARM runtime -> vendor/sysroot (checksummed)"
+	@echo "make corpus   scripts/fetch-corpus.sh   every SPYRUS file, all platforms, x86-64 closure"
+	@echo "make setup    scripts/setup-udev.sh     udev rule, spyrus group, lock + /etc/spyrus (sudo)"
+	@echo "make status   bin/spy.sh --status       talk to the token (read-only)"
+	@echo "make state    bin/spy.sh --state"
+	@echo "make list     bin/spy.sh --list         key slots"
+	@echo "make verify   scripts/verify.py on the shipped example triple"
+	@echo "make check    shellcheck + verify + checksum self-test"
+fetch:   ; scripts/fetch-vendor.sh
+corpus:  ; scripts/fetch-corpus.sh
+setup:   ; scripts/setup-udev.sh
+status:  ; bin/spy.sh --status
+state:   ; bin/spy.sh --state
+list:    ; bin/spy.sh --list
+verify:  ; python3 scripts/verify.py examples/pubkey.pem examples/msg.txt examples/sig.bin
+check:
+	shellcheck -x -s sh bin/*.sh scripts/fetch-corpus.sh
+	shellcheck -x scripts/fetch-vendor.sh scripts/setup-udev.sh
+	python3 scripts/verify.py examples/pubkey.pem examples/msg.txt examples/sig.bin
+	@[ -d vendor/sysroot ] && scripts/fetch-vendor.sh --verify | tail -1 || echo "vendor/sysroot not fetched (make fetch)"
+clean:
+	rm -rf vendor/sysroot vendor/spyrus-corpus
