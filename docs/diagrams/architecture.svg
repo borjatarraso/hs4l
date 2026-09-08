@@ -76,7 +76,7 @@
 <text x="520" y="380" fill="#e9ddc7" font-size="10.5">pub.pem   ← bin/spy.sh --getkey --index 1</text>
 <text x="520" y="398" fill="#e9ddc7" font-size="10.5">sig.bin   ← bin/spy.sh --sign msg --index 1 --binary</text>
 <text x="520" y="424" fill="#7fd0e0" font-size="11">python3 scripts/verify.py pub.pem msg sig.bin</text>
-<text x="520" y="442" fill="#4fd08a" font-size="11">VALID · DSA/SHA-1 (FIPS 186-2) via pyca/cryptography</text>
+<text x="520" y="442" fill="#4fd08a" font-size="11">VALID · DSA/SHA-1 (FIPS 186-2), standard library only</text>
 
 <!-- arrows -->
 <line x1="180" y1="150" x2="214" y2="98" stroke="#7fd0e0" stroke-width="2" marker-end="url(#ac)"/>
