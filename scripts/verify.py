@@ -20,17 +20,25 @@ def main(argv):
     pub_path, msg_path, sig_path = argv[1:]
     try:
         from cryptography.hazmat.primitives import hashes, serialization
+        from cryptography.hazmat.primitives.asymmetric import dsa
         from cryptography.exceptions import InvalidSignature
     except ImportError:
         print("hs4l: missing dependency -- pip install cryptography", file=sys.stderr)
         return 2
 
-    with open(pub_path, "rb") as f:
-        pub = serialization.load_pem_public_key(f.read())
-    with open(msg_path, "rb") as f:
-        msg = f.read()
-    with open(sig_path, "rb") as f:
-        sig = f.read()
+    try:
+        with open(pub_path, "rb") as f:
+            pub = serialization.load_pem_public_key(f.read())
+        with open(msg_path, "rb") as f:
+            msg = f.read()
+        with open(sig_path, "rb") as f:
+            sig = f.read()
+    except (OSError, ValueError) as e:
+        print(f"hs4l: {e}", file=sys.stderr)
+        return 2
+    if not isinstance(pub, dsa.DSAPublicKey):
+        print(f"hs4l: {pub_path} is not a DSA public key (the LYNKS signs DSA/SHA-1)", file=sys.stderr)
+        return 2
 
     try:
         pub.verify(sig, msg, hashes.SHA1())  # DER-encoded r,s
