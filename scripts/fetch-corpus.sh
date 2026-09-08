@@ -15,7 +15,8 @@
 # spyrus_util natively on a 64-bit PC without qemu (see bin/spy-native.sh).
 #
 # Every file is checked against CHECKSUMS.corpus.sha256 (in the repo); see
-# docs/CORPUS-INDEX.md for what each file is.  HS4L_RSYNC overrides the host.
+# docs/CORPUS-INDEX.md for what each file is.  HS4L_RSYNC overrides the host,
+# HS4L_CORPUS the destination.
 set -eu
 # shellcheck disable=SC1007  # CDPATH= is intentional: keep cd silent
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
@@ -24,7 +25,7 @@ SUMS="$ROOT/CHECKSUMS.corpus.sha256"
 HOST="${HS4L_RSYNC:-rsync://rsync.guralp.com}"
 NAM64_LIBS='^(usr/)?lib64/(ld-|libc[.-]|libm[.-]|libdl|librt|libpthread|libgcc_s|libz\.so|libssl\.so\.1\.0\.0|libcrypto\.so\.1\.0\.0|libusb-1\.0|libgslutil|libiso8601|libioline-(consumer|pcd)|libspyrus|libcurl|libidn|libssh|libgssapi|libkrb|libk5|libcom_err|libldap|liblber|libsasl)'
 
-command -v rsync >/dev/null 2>&1 || { echo "hs4l: rsync required." >&2; exit 127; }
+command -v rsync >/dev/null 2>&1 || { echo "hs4l: rsync required; install the rsync package." >&2; exit 127; }
 mkdir -p "$DEST"
 
 # rsync's listing is "perms size date time name"; take the name (field 5 on)
@@ -45,7 +46,10 @@ for m in platinum-stable platinum-prerelease platinum-crosslib ctbto-prerelease;
   esac
   rm -f "$LIST.raw"
   mkdir -p "$DEST/$m"
-  rsync -a --files-from="$LIST" "$HOST/$m/" "$DEST/$m/"
+  rsync -a --files-from="$LIST" "$HOST/$m/" "$DEST/$m/" || {
+    echo "hs4l: rsync of $m failed; re-run scripts/fetch-corpus.sh (it resumes), or check $HOST is reachable" >&2
+    exit 1
+  }
   echo "hs4l:   $(wc -l < "$LIST") files"
 done
 
