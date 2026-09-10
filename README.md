@@ -241,3 +241,8 @@ that are distributed as source under an explicit GPL notice: the `libspyrus`
 public headers, the 2008 internal header with the full card command set, and
 the two provisioning scripts. Provenance, checksums and per-file licence are in
 `third_party/spyrus-gpl/README.md`. Binaries stay out of the repo.
+
+## Documentation
+
+- [`CHANGELOG.md`](CHANGELOG.md) — what changed, by version
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to contribute
