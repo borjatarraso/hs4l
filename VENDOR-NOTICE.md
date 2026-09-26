@@ -58,3 +58,28 @@ Only files carrying their own GPL notice are committed, under
 binary, and every file without a licence notice, remains fetch-at-install
 via `scripts/fetch-vendor.sh` / `scripts/fetch-corpus.sh` (the corpus is
 verified against `CHECKSUMS.corpus.sha256`).
+
+## Identification checksums for the Windows middleware (not redistributed, not required)
+
+For provenance: the final Windows middleware release, **En-Sign 8.0.0.9**
+(SPYRUS, 2005-2010), was located on original optical media and analysed
+statically for the documentation in `docs/SPEX2.md` and `docs/HARDWARE.md`.
+Its files are **not** in this repository and are not needed to run hs4l.
+The SHA-256 values below exist so anyone who finds a copy can verify what
+they have:
+
+| artifact | SHA-256 |
+|---|---|
+| `ensign-8.0.0.9.iso` (disc image, 45,613,056 B) | `72f53123aab4fb772945d69a36f96f7a8d3bc6e7b471ffcde04baf1346cc9d46` |
+| `En-Sign.msi` | `ca0df58757e4f0a79c7db4ab4c10f57a847c39d699bde59ae323fefc7df33580` |
+| `SpyPK11.dll` (PKCS#11 v2.x module) | `b6f370a61164ba2a03037bb863f3651ec45420af7ff9cd1dddae422b7a81c868` |
+| `Spex32.dll` | `015a32d4f3b6924ee1067c0d21c805bc96ba3675f06a63ee51d6277a0c26a4a3` |
+| `Cilib32.dll` | `661f0f239a32330f4749b9474a4eca55cddfa424691a4989666a68b9041a452d` |
+| `lynksusbio.dll` (USB session handler) | `9d199d14809d6f9e95b3b905a713211c22f3c27904a9e5458da9740dedd1c0c0` |
+| `cmdproc.dll` | `d9d2bc6f7f196e7993a78253a7bf950193de8d34eaa7841c51843e2f5a40aaba` |
+| `SCDaemon.exe` | `6e1a938ee231248dd5b5801f1ed8d8205361ae0354963b27336bbbd8d532f286` |
+| `SpyRSAhw.dll` (RSA CSP) | `b77cd254f3260e3c03905d37c814e82e23da9ba653ccae744d4d6662c7034a53` |
+
+The USB kernel driver on the disc (`SCARDLYNKSUSBW.sys`, v1.1.0.6,
+2005-01-20) is byte-identical to the copy downloadable from Microsoft's
+Update Catalog; the analysis of it predates the disc.

@@ -42,6 +42,13 @@ over raw USB (`libusb`, vendor ID `08df`) or through the PCMCIA driver's
 | SPYRUS Rosetta (Series II/III smart cards and USB), Hydra PC, WorkSafe / Secure Pocket Drive | PKCS#11 / CCID / mass storage | **Not covered** — different protocols, nothing here talks to them |
 | Other Fortezza-family PC cards | PCMCIA | Unknown; `spyrus_cs.ko` binds only to `0244:0300` |
 
+To identify any other SPYRUS card, token or reader (Rosetta USB V1-V3,
+PCMCIA LYNKS Privacy/EES/CA/PrivCOM, FORTEZZA cards, PAR2 keypad reader),
+see **[docs/HARDWARE.md](docs/HARDWARE.md)** — the full device-ID and ATR
+tables. For what the vendor's Windows middleware looked like inside (the
+`SH_*` session-handler stack hs4l replaces), see
+**[docs/SPEX2.md](docs/SPEX2.md)**.
+
 Hosts: verified on x86-64 Fedora, both under `qemu-arm-static` (`bin/spy.sh`)
 and natively with the x86-64 build (`bin/spy-native.sh`). Any Linux with
 `qemu-user-static` should run the ARM build (aarch64 boards included);
@@ -159,7 +166,7 @@ udev/                   the udev rule
 Makefile                make fetch / setup / status / verify / test / check
 tests/                  unittest suite for verify.py (make test)
 .github/                device-report issue template
-docs/                   PROTOCOL · REINITIALIZE · TROUBLESHOOTING · CORPUS-INDEX + diagrams/
+docs/                   PROTOCOL · REINITIALIZE · TROUBLESHOOTING · HARDWARE · SPEX2 · CORPUS-INDEX + diagrams/
 examples/               real pubkey / message / signature + rejected params
 third_party/spyrus-gpl/ GPL-licensed vendor headers + scripts, with provenance
 CHECKSUMS.sha256        SHA-256 of the 20 vendor files these docs target
@@ -246,3 +253,9 @@ the two provisioning scripts. Provenance, checksums and per-file licence are in
 
 - [`CHANGELOG.md`](CHANGELOG.md) — what changed, by version
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to contribute
+- [`docs/PROTOCOL.md`](docs/PROTOCOL.md) — the SPYCOS exchange, byte by byte
+- [`docs/REINITIALIZE.md`](docs/REINITIALIZE.md) — full reinit walkthrough
+- [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) — real failures and their root causes
+- [`docs/HARDWARE.md`](docs/HARDWARE.md) — identify any SPYRUS card/token/reader (IDs, ATRs)
+- [`docs/SPEX2.md`](docs/SPEX2.md) — the Windows SPEX/2 middleware mapped (the `SH_*` stack)
+- [`docs/CORPUS-INDEX.md`](docs/CORPUS-INDEX.md) — the wider SPYRUS firmware corpus

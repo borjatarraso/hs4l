@@ -64,3 +64,22 @@ Each of these cost real time; each is traced to a root cause.
 - **`qemu-arm-static: not found`.** Install the `qemu-user-static` package.
 
 - **Vendor binary not found.** Run `scripts/fetch-vendor.sh` first.
+
+- **Forgotten or blocked PIN — know the failure mode before you try one.**
+  The card keeps a wrong-PIN counter per role (vendor manuals disagree on
+  the exact limit — 5 tries in one, 10 in another — assume **5**). When the
+  **User PIN** blocks, it stays blocked even if you then enter the right
+  PIN; the vendor unblock flow (which needs the **Admin PIN**) resets the
+  User PIN to the **default reset value `1234`**, which you then change.
+  "Change PIN" never worked on LYNKS devices at all — reset-with-Admin-PIN
+  is the only path. **A blocked Admin PIN is unrecoverable and zeroizes the
+  card permanently — never try candidate Admin PINs.** Factory PIN policy
+  is 4–8 characters, alphanumeric allowed. Details and sources:
+  [docs/SPEX2.md](SPEX2.md).
+
+- **Card present, transport works, but commands are refused.** Before the
+  card accepts real commands it expects a session bring-up exchange that
+  raw single-APDU probes don't perform — everything else returns the
+  generic refusal. `libspyrus` does the bring-up for hs4l; if you are
+  hand-rolling APDUs, capture the vendor stack's `SH_Process` buffers in a
+  Windows VM first (how-to in [docs/SPEX2.md](SPEX2.md)).

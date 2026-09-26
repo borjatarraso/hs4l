@@ -4,6 +4,29 @@ All notable changes to hs4l are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions are git
 tags `vX.Y`.
 
+## [Unreleased]
+
+### Added
+- `docs/HARDWARE.md` — identification guide for the whole SPYRUS hardware
+  family (USB `08df:0001..0003` Rosetta V1-V3, PCMCIA LYNKS
+  Privacy/EES/CA/PrivCOM and FORTEZZA cards, PAR2 keypad reader, CCID
+  readers) with the full ATR table, compiled from the En-Sign 8.0.0.9
+  driver INFs and CSP registry.
+- `docs/SPEX2.md` — map of the Windows SPEX/2 middleware recovered by
+  static analysis: every transport backend (`lynksusbio`, `isa95io`,
+  `isantio`, `isaxpio`, `mpl2kio`, `spexbio`) exports the same six-call
+  `SH_*` session-handler contract; `cmdproc.dll` re-exports it one level
+  up; `lynksusbio` talks to `\\.\SpyrusLynksUsb-<n>` via `DeviceIoControl`
+  with runtime-resolved API names. Includes the vendor-documented PIN
+  lifecycle (block at 5 wrong tries, Admin-PIN unblock resets the User PIN
+  to `1234`, a blocked Admin PIN permanently zeroizes the card) and the
+  on-card PFX/P12 import capability.
+- Troubleshooting: PIN-block failure modes and the session-bring-up refusal
+  pattern, both pointing at the new docs.
+- `VENDOR-NOTICE.md`: SHA-256 identification checksums for the En-Sign
+  8.0.0.9 artifacts the analysis was done against (identification only —
+  nothing redistributed, nothing required to run hs4l).
+
 ## [0.9] - 2026-09-08
 
 ### Changed
