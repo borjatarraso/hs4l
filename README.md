@@ -20,6 +20,13 @@ firmware run under `qemu-arm-static` against the raw USB pipe via `libusb`.
 | Proven | keygen · sign · verify · CSR · reinitialise-from-scratch |
 | Host tested | x86-64 Fedora + `qemu-arm-static` + `libusb` |
 
+## Quick install
+
+```bash
+make    # verify the toolchain (python3 required; qemu-user-static advised) — nothing auto-installed
+./run   # start with the defaults: environment status, or forward args to bin/spy.sh
+```
+
 ## ⚠️ Read first: the vendor binaries are not in this repo
 
 `spyrus_util` and `libspyrus` are **SPYRUS / firmware-vendor proprietary** and are **not

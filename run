@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# ./run -- hs4l entry point.
+#
+#   ./run              print the environment status (python3, qemu-arm-static,
+#                      vendor runtime, udev setup) and how to go on; exits 0
+#                      when the required toolchain (python3) is present
+#   ./run <args>       forwarded to bin/spy.sh, e.g. ./run --status
+#   ./run --help       bin/spy.sh's help
+#
+# The vendor binaries are not in this repo; scripts/fetch-vendor.sh pulls
+# them (network) and is never run implicitly.
+set -euo pipefail
+cd "$(dirname "$(readlink -f "$0")")"
+
+if [ $# -gt 0 ]; then
+    exec bin/spy.sh "$@"
+fi
+
+ok=0
+if command -v python3 >/dev/null 2>&1; then
+    echo "python3:        ok ($(python3 --version))"
+else
+    echo "python3:        MISSING -- install python3 (every hs4l script needs it)"
+    ok=1
+fi
+if command -v qemu-arm-static >/dev/null 2>&1; then
+    echo "qemu-arm-static: ok"
+else
+    echo "qemu-arm-static: missing -- install qemu-user-static to run the vendor ARM tool"
+fi
+if [ -x vendor/sysroot/usr/sbin/spyrus_util ]; then
+    echo "vendor runtime:  ok (vendor/sysroot)"
+else
+    echo "vendor runtime:  not fetched -- scripts/fetch-vendor.sh (network; see VENDOR-NOTICE.md)"
+fi
+if [ -w /var/lock/spyrus.lck ] || [ ! -e /var/lock/spyrus.lck ]; then
+    echo "token lock:      usable"
+else
+    echo "token lock:      not writable -- scripts/setup-udev.sh sets up the spyrus group"
+fi
+echo "next:            ./run --status (talk to the token, read-only)"
+exit "$ok"
